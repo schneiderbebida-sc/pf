@@ -1455,7 +1455,7 @@
 </div>
 
 <script>
-// Sistema de Pedidos - Schneider Bebidas (Versão com CSV)
+// Sistema de Pedidos - Schneider Bebidas (Versão Corrigida PDF + CSV)
 let pedido = JSON.parse(localStorage.getItem('pedido_schneider')) || {};
 
 function atualizarContador() {
@@ -1535,13 +1535,25 @@ function gerarRelatorio(nomeCli, emailCli, telCli) {
     let totalGeral = 0;
 
     // Preparar dados para CSV
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "RELATORIO DE PEDIDO - SCHNEIDER BEBIDAS\n";
-    csvContent += `Data:;${dataAtual}\n`;
-    csvContent += `Cliente:;${nomeCli}\n`;
-    csvContent += `E-mail:;${emailCli || '-'}\n`;
-    csvContent += `Telefone:;${telCli || '-'}\n\n`;
-    csvContent += "Produto;Quantidade;Preco Unitario;Subtotal\n";
+    let csvData = "RELATORIO DE PEDIDO - SCHNEIDER BEBIDAS\\n";
+    csvData += `Data:;${dataAtual}\\n`;
+    csvData += `Cliente:;${nomeCli}\\n`;
+    csvData += `E-mail:;${emailCli || '-'}\\n`;
+    csvData += `Telefone:;${telCli || '-'}\\n\\n`;
+    csvData += "Produto;Quantidade;Preco Unitario;Subtotal\\n";
+
+    let tabelaHtml = "";
+    itens.forEach(item => {
+        const precoLimpo = item.preco.replace('R$', '').replace(/\\./g, '').replace(',', '.').trim();
+        const precoNum = parseFloat(precoLimpo) || 0;
+        const subtotal = precoNum * item.qtd;
+        totalGeral += subtotal;
+        
+        tabelaHtml += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${item.preco}</td><td>R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td></tr>`;
+        csvData += `${item.nome};${item.qtd};${item.preco};R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\\n`;
+    });
+
+    csvData += `\\n;TOTAL GERAL:;;R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
 
     let htmlRelatorio = `
     <!DOCTYPE html>
@@ -1569,7 +1581,7 @@ function gerarRelatorio(nomeCli, emailCli, telCli) {
     <body>
         <div class="no-print" style="text-align: right;">
             <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
-            <button class="btn-csv" id="download-csv">📥 Baixar CSV (Excel)</button>
+            <button class="btn-csv" onclick="baixarCSV()">📥 Baixar CSV (Excel)</button>
         </div>
         <div class="header">
             <h1>RELATÓRIO DE PEDIDO</h1>
@@ -1585,38 +1597,23 @@ function gerarRelatorio(nomeCli, emailCli, telCli) {
                 <tr><th>Produto</th><th>Qtd</th><th>Preço Unit.</th><th>Subtotal</th></tr>
             </thead>
             <tbody>
-    `;
-
-    itens.forEach(item => {
-        const precoLimpo = item.preco.replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
-        const precoNum = parseFloat(precoLimpo) || 0;
-        const subtotal = precoNum * item.qtd;
-        totalGeral += subtotal;
-        
-        htmlRelatorio += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${item.preco}</td><td>R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td></tr>`;
-        
-        // Adicionar ao CSV
-        csvContent += `${item.nome};${item.qtd};${item.preco};R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\n`;
-    });
-
-    csvContent += `\n;TOTAL GERAL:;;R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-
-    htmlRelatorio += `
+                ${tabelaHtml}
             </tbody>
         </table>
         <div class="total">Total Estimado: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
         <div class="footer"><p>Este documento é uma lista de conferência para pedido ao fornecedor.</p></div>
         
         <script>
-            document.getElementById('download-csv').onclick = function() {
-                const encodedUri = encodeURI("${csvContent}");
+            function baixarCSV() {
+                const csvContent = "data:text/csv;charset=utf-8," + "${csvData}";
+                const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "pedido_schneider_${dataAtual.replace(/\//g, '-')}.csv");
+                link.setAttribute("download", "pedido_schneider_${dataAtual.replace(/\\//g, '-')}.csv");
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            };
+            }
         <\/script>
     </body>
     </html>
@@ -1641,9 +1638,9 @@ document.addEventListener('DOMContentLoaded', () => {
         controles.className = 'controles-pedido';
         controles.style.cssText = 'display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;';
         controles.innerHTML = `
-            <button onclick="alterarQuantidade('${id}', '${nome.replace(/'/g, "\\'")}', '${preco}', -1)" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #3d4f45; background: white; color: #3d4f45; cursor: pointer; font-weight: bold;">-</button>
-            <input type="number" id="qtd-${id}" value="${qtdAtual}" onchange="digitarQuantidade('${id}', '${nome.replace(/'/g, "\\'")}', '${preco}', this.value)" style="width: 50px; text-align: center; border: 1px solid #ddd; border-radius: 4px; font-weight: bold; background: #fff; padding: 2px;">
-            <button onclick="alterarQuantidade('${id}', '${nome.replace(/'/g, "\\'")}', '${preco}', 1)" style="width: 30px; height: 30px; border-radius: 50%; border: none; background: #3d4f45; color: white; cursor: pointer; font-weight: bold;">+</button>
+            <button onclick="alterarQuantidade('${id}', '${nome.replace(/'/g, "\\\\'")}', '${preco}', -1)" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #3d4f45; background: white; color: #3d4f45; cursor: pointer; font-weight: bold;">-</button>
+            <input type="number" id="qtd-${id}" value="${qtdAtual}" onchange="digitarQuantidade('${id}', '${nome.replace(/'/g, "\\\\'")}', '${preco}', this.value)" style="width: 50px; text-align: center; border: 1px solid #ddd; border-radius: 4px; font-weight: bold; background: #fff; padding: 2px;">
+            <button onclick="alterarQuantidade('${id}', '${nome.replace(/'/g, "\\\\'")}', '${preco}', 1)" style="width: 30px; height: 30px; border-radius: 50%; border: none; background: #3d4f45; color: white; cursor: pointer; font-weight: bold;">+</button>
         `;
         card.querySelector('.card-body').appendChild(controles);
     });
