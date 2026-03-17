@@ -211,7 +211,7 @@
 <header>
   <img class="logo" src="images/logo.jpeg" alt="Logo da Empresa" />
   <div class="header-text">
-    <h1>CATÁLOGO DE BEBIDAS <span style="font-size: 0.8rem; background: #27ae60; color: white; padding: 2px 8px; border-radius: 10px; vertical-align: middle; margin-left: 10px;">SISTEMA DE PEDIDOS ATIVO</span></h1>
+    <h1>CATÁLOGO DE BEBIDAS</h1>
     <p>Seleção Premium de Produtos</p>
   </div>
 </header>
@@ -1374,7 +1374,7 @@
 
 </main>
 
-<footer>
+<footer><p>Contato: schneider.bebidas@outlook.com | Telefone: 47 93386-0900</p>
   <img class="logo-footer" src="images/logo.jpeg" alt="Logo" />
   <p>Catálogo de Bebidas &mdash; Todos os preços em Reais (R$)</p>
   <p style="margin-top:6px; font-size:0.78rem;">Preços sujeitos a alteração sem aviso prévio.</p>
@@ -1575,9 +1575,14 @@
         if (itens.length === 0) return;
         const dataAtual = new Date().toLocaleDateString('pt-BR');
         let totalGeral = 0;
-        let csvData = "RELATORIO DE PEDIDO - SCHNEIDER BEBIDAS\\nData:;${dataAtual}\\nCliente:;${nomeCli}\\n";
-        if (cnpjCli) csvData += "CNPJ:;${cnpjCli}\\n";
-        csvData += "E-mail:;${emailCli || '-'}\\nTelefone:;${telCli || '-'}\\n\\nProduto;Quantidade;Preco Unitario;Subtotal\\n";
+        
+        // CSV: Dados do cliente em uma linha no topo
+        let csvData = "DADOS DO CLIENTE\\n";
+        csvData += "Data;Nome/Empresa;CNPJ;E-mail;Telefone\\n";
+        csvData += `${dataAtual};${nomeCli};${cnpjCli || '-'};${emailCli || '-'};${telCli || '-'}\\n\\n`;
+        csvData += "ITENS DO PEDIDO\\n";
+        csvData += "Produto;Quantidade;Preco Unitario;Subtotal\\n";
+        
         let tabelaHtml = "";
         itens.forEach(item => {
             const precoLimpo = item.preco.replace('R$', '').replace(/\\./g, '').replace(',', '.').trim();
@@ -1588,6 +1593,7 @@
             csvData += `${item.nome};${item.qtd};${item.preco};R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\\n`;
         });
         csvData += "\\n;TOTAL GERAL:;;R$ " + totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        
         const win = window.open('', '_blank');
         win.document.write(`<html><head><title>Relatório</title><style>body{font-family:Arial;padding:40px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px}th{background:#3d4f45;color:#fff}.total{text-align:right;font-weight:bold;margin-top:20px}@media print{.no-print{display:none}}</style></head><body><div class="no-print"><button onclick="window.print()">Imprimir</button><button onclick="baixarCSV()">CSV</button></div><h1>PEDIDO</h1><p>Cliente: ${nomeCli}</p>${cnpjCli ? `<p>CNPJ: ${cnpjCli}</p>` : ''}<table><thead><tr><th>Produto</th><th>Qtd</th><th>Preço</th><th>Subtotal</th></tr></thead><tbody>${tabelaHtml}</tbody></table><div class="total">Total: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div><script>function baixarCSV(){const blob=new Blob(["\\ufeff"+"${csvData}"],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="pedido.csv";a.click()}<\/script></body></html>`);
         win.document.close();
@@ -1625,7 +1631,7 @@
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicializar);
     else inicializar();
-    setTimeout(inicializar, 2000); // Garantia extra
+    setTimeout(inicializar, 2000);
 })();
 </script>
 </body></html>
