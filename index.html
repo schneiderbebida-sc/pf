@@ -1559,7 +1559,7 @@
 <script>
 (function() {
     let pedido = JSON.parse(localStorage.getItem('pedido_schneider')) || {};
-    let dadosCliente = {};
+    let dadosCliente = JSON.parse(localStorage.getItem('dados_cliente_schneider')) || {};
 
     window.toggleCNPJ = function(valor) {
         const campoCnpj = document.getElementById('campo-cnpj');
@@ -1613,7 +1613,22 @@
         }
     };
 
-    window.abrirModal = function() { document.getElementById('modal-cadastro').style.display = 'flex'; };
+    window.abrirModal = function() { 
+        // Preencher campos com dados salvos se existirem
+        if (dadosCliente.nome) document.getElementById('nome-cliente').value = dadosCliente.nome;
+        if (dadosCliente.email) document.getElementById('email-cliente').value = dadosCliente.email;
+        if (dadosCliente.tel) document.getElementById('tel-cliente').value = dadosCliente.tel;
+        if (dadosCliente.cnpj) {
+            document.getElementById('is-empresa').value = 'sim';
+            window.toggleCNPJ('sim');
+            document.getElementById('cnpj-cliente').value = dadosCliente.cnpj;
+        } else {
+            document.getElementById('is-empresa').value = 'nao';
+            window.toggleCNPJ('nao');
+        }
+        document.getElementById('modal-cadastro').style.display = 'flex'; 
+    };
+    
     window.fecharModal = function() { document.getElementById('modal-cadastro').style.display = 'none'; };
 
     window.confirmarPedido = function() {
@@ -1625,7 +1640,10 @@
         if (!nome) { alert("Por favor, preencha o nome."); return; }
         if (isEmpresa === 'sim' && !cnpj) { alert("Para empresas, o preenchimento do CNPJ é obrigatório."); return; }
         
+        // Salvar dados para a próxima vez
         dadosCliente = { nome, email, tel, cnpj: isEmpresa === 'sim' ? cnpj : null, data: new Date().toLocaleDateString('pt-BR') };
+        localStorage.setItem('dados_cliente_schneider', JSON.stringify(dadosCliente));
+        
         window.fecharModal();
         window.gerarRelatorio();
     };
