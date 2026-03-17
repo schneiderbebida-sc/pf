@@ -1415,7 +1415,7 @@
 #btn-limpar {
     position: fixed;
     bottom: 30px;
-    right: 260px; /* Posicionado à esquerda do botão de relatório */
+    right: 260px;
     background: #c0392b;
     color: white;
     border: none;
@@ -1455,7 +1455,7 @@
 </div>
 
 <script>
-// Sistema de Pedidos - Schneider Bebidas (Versão com Cadastro e Limpar)
+// Sistema de Pedidos - Schneider Bebidas (Versão com CSV)
 let pedido = JSON.parse(localStorage.getItem('pedido_schneider')) || {};
 
 function atualizarContador() {
@@ -1534,6 +1534,15 @@ function gerarRelatorio(nomeCli, emailCli, telCli) {
     const dataAtual = new Date().toLocaleDateString('pt-BR');
     let totalGeral = 0;
 
+    // Preparar dados para CSV
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "RELATORIO DE PEDIDO - SCHNEIDER BEBIDAS\n";
+    csvContent += `Data:;${dataAtual}\n`;
+    csvContent += `Cliente:;${nomeCli}\n`;
+    csvContent += `E-mail:;${emailCli || '-'}\n`;
+    csvContent += `Telefone:;${telCli || '-'}\n\n`;
+    csvContent += "Produto;Quantidade;Preco Unitario;Subtotal\n";
+
     let htmlRelatorio = `
     <!DOCTYPE html>
     <html lang="pt-BR">
@@ -1553,12 +1562,14 @@ function gerarRelatorio(nomeCli, emailCli, telCli) {
             .total { text-align: right; font-size: 1.2rem; font-weight: bold; color: #3d4f45; }
             .footer { margin-top: 50px; font-size: 0.9rem; color: #666; text-align: center; }
             @media print { .no-print { display: none; } body { padding: 0; } }
-            .btn-print { background: #3d4f45; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; margin-bottom: 20px; }
+            .btn-print { background: #3d4f45; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; margin-bottom: 20px; margin-right: 10px; }
+            .btn-csv { background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; margin-bottom: 20px; }
         </style>
     </head>
     <body>
         <div class="no-print" style="text-align: right;">
             <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+            <button class="btn-csv" id="download-csv">📥 Baixar CSV (Excel)</button>
         </div>
         <div class="header">
             <h1>RELATÓRIO DE PEDIDO</h1>
@@ -1581,14 +1592,32 @@ function gerarRelatorio(nomeCli, emailCli, telCli) {
         const precoNum = parseFloat(precoLimpo) || 0;
         const subtotal = precoNum * item.qtd;
         totalGeral += subtotal;
+        
         htmlRelatorio += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${item.preco}</td><td>R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td></tr>`;
+        
+        // Adicionar ao CSV
+        csvContent += `${item.nome};${item.qtd};${item.preco};R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\n`;
     });
+
+    csvContent += `\n;TOTAL GERAL:;;R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
 
     htmlRelatorio += `
             </tbody>
         </table>
         <div class="total">Total Estimado: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
         <div class="footer"><p>Este documento é uma lista de conferência para pedido ao fornecedor.</p></div>
+        
+        <script>
+            document.getElementById('download-csv').onclick = function() {
+                const encodedUri = encodeURI("${csvContent}");
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "pedido_schneider_${dataAtual.replace(/\//g, '-')}.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+        <\/script>
     </body>
     </html>
     `;
