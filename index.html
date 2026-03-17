@@ -1382,16 +1382,93 @@
 
 </body</html>
 
+<style>
+/* Estilos para o Modal de Cadastro */
+#modal-cadastro {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+.modal-content h2 { margin-top: 0; color: #3d4f45; font-size: 1.4rem; margin-bottom: 20px; }
+.modal-content label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+.modal-content input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+.modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
+.btn-confirmar { background: #3d4f45; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.btn-cancelar { background: #ccc; color: #333; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+/* Botão Limpar */
+#btn-limpar {
+    position: fixed;
+    bottom: 30px;
+    right: 260px; /* Posicionado à esquerda do botão de relatório */
+    background: #c0392b;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: none;
+    font-weight: bold;
+}
+@media (max-width: 600px) {
+    #btn-limpar { right: auto; left: 30px; padding: 15px; font-size: 0.9rem; }
+    #btn-relatorio { padding: 15px; font-size: 0.9rem; }
+}
+</style>
+
+<!-- Estrutura do Modal -->
+<div id="modal-cadastro">
+    <div class="modal-content">
+        <h2>Identificação do Pedido</h2>
+        <label for="nome-cliente">Nome Completo:</label>
+        <input type="text" id="nome-cliente" placeholder="Digite seu nome">
+        
+        <label for="email-cliente">E-mail:</label>
+        <input type="email" id="email-cliente" placeholder="seu@email.com">
+        
+        <label for="tel-cliente">Telefone:</label>
+        <input type="tel" id="tel-cliente" placeholder="(00) 00000-0000">
+        
+        <div class="modal-buttons">
+            <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-confirmar" onclick="confirmarPedido()">Gerar Relatório</button>
+        </div>
+    </div>
+</div>
+
 <script>
-// Sistema de Pedidos - Schneider Bebidas (Versão com Digitação Manual)
+// Sistema de Pedidos - Schneider Bebidas (Versão com Cadastro e Limpar)
 let pedido = JSON.parse(localStorage.getItem('pedido_schneider')) || {};
 
 function atualizarContador() {
     const totalItens = Object.values(pedido).reduce((acc, curr) => acc + curr.qtd, 0);
     const btnRelatorio = document.getElementById('btn-relatorio');
+    const btnLimpar = document.getElementById('btn-limpar');
+    
     if (btnRelatorio) {
         btnRelatorio.innerHTML = `📋 Gerar Relatório (${totalItens})`;
         btnRelatorio.style.display = totalItens > 0 ? 'block' : 'none';
+    }
+    if (btnLimpar) {
+        btnLimpar.style.display = totalItens > 0 ? 'block' : 'none';
     }
     localStorage.setItem('pedido_schneider', JSON.stringify(pedido));
 }
@@ -1400,35 +1477,57 @@ function alterarQuantidade(id, nome, preco, delta) {
     if (!pedido[id]) {
         pedido[id] = { nome, preco, qtd: 0 };
     }
-    
     pedido[id].qtd += delta;
-    
-    if (pedido[id].qtd <= 0) {
-        delete pedido[id];
-    }
-    
+    if (pedido[id].qtd <= 0) delete pedido[id];
     const input = document.getElementById(`qtd-${id}`);
     if (input) input.value = pedido[id] ? pedido[id].qtd : 0;
-    
     atualizarContador();
 }
 
 function digitarQuantidade(id, nome, preco, valor) {
     const qtd = parseInt(valor) || 0;
-    
     if (qtd <= 0) {
         delete pedido[id];
     } else {
         pedido[id] = { nome, preco, qtd: qtd };
     }
-    
     const input = document.getElementById(`qtd-${id}`);
     if (input) input.value = qtd > 0 ? qtd : 0;
-    
     atualizarContador();
 }
 
-function gerarRelatorio() {
+function limparPedido() {
+    if (confirm("Deseja realmente limpar todo o seu pedido e recomeçar?")) {
+        pedido = {};
+        const inputs = document.querySelectorAll('input[id^="qtd-"]');
+        inputs.forEach(input => input.value = 0);
+        atualizarContador();
+    }
+}
+
+function abrirModal() {
+    document.getElementById('modal-cadastro').style.display = 'flex';
+}
+
+function fecharModal() {
+    document.getElementById('modal-cadastro').style.display = 'none';
+}
+
+function confirmarPedido() {
+    const nome = document.getElementById('nome-cliente').value;
+    const email = document.getElementById('email-cliente').value;
+    const tel = document.getElementById('tel-cliente').value;
+    
+    if (!nome) {
+        alert("Por favor, preencha pelo menos o seu nome.");
+        return;
+    }
+    
+    fecharModal();
+    gerarRelatorio(nome, email, tel);
+}
+
+function gerarRelatorio(nomeCli, emailCli, telCli) {
     const itens = Object.values(pedido);
     if (itens.length === 0) return;
 
@@ -1445,20 +1544,16 @@ function gerarRelatorio() {
             body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
             .header { text-align: center; border-bottom: 2px solid #3d4f45; padding-bottom: 20px; margin-bottom: 30px; }
             .header h1 { color: #3d4f45; margin: 0; }
+            .info-cliente { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 30px; border-left: 5px solid #3d4f45; }
+            .info-cliente p { margin: 5px 0; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
             th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
             th { background-color: #3d4f45; color: white; }
             tr:nth-child(even) { background-color: #f9f9f9; }
             .total { text-align: right; font-size: 1.2rem; font-weight: bold; color: #3d4f45; }
             .footer { margin-top: 50px; font-size: 0.9rem; color: #666; text-align: center; }
-            @media print {
-                .no-print { display: none; }
-                body { padding: 0; }
-            }
-            .btn-print {
-                background: #3d4f45; color: white; border: none; padding: 10px 20px;
-                border-radius: 5px; cursor: pointer; font-size: 1rem; margin-bottom: 20px;
-            }
+            @media print { .no-print { display: none; } body { padding: 0; } }
+            .btn-print { background: #3d4f45; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; margin-bottom: 20px; }
         </style>
     </head>
     <body>
@@ -1469,14 +1564,14 @@ function gerarRelatorio() {
             <h1>RELATÓRIO DE PEDIDO</h1>
             <p>Schneider Bebidas | Data: ${dataAtual}</p>
         </div>
+        <div class="info-cliente">
+            <p><strong>Cliente:</strong> ${nomeCli}</p>
+            ${emailCli ? `<p><strong>E-mail:</strong> ${emailCli}</p>` : ''}
+            ${telCli ? `<p><strong>Telefone:</strong> ${telCli}</p>` : ''}
+        </div>
         <table>
             <thead>
-                <tr>
-                    <th>Produto</th>
-                    <th>Qtd</th>
-                    <th>Preço Unit.</th>
-                    <th>Subtotal</th>
-                </tr>
+                <tr><th>Produto</th><th>Qtd</th><th>Preço Unit.</th><th>Subtotal</th></tr>
             </thead>
             <tbody>
     `;
@@ -1486,24 +1581,14 @@ function gerarRelatorio() {
         const precoNum = parseFloat(precoLimpo) || 0;
         const subtotal = precoNum * item.qtd;
         totalGeral += subtotal;
-        
-        htmlRelatorio += `
-            <tr>
-                <td>${item.nome}</td>
-                <td>${item.qtd}</td>
-                <td>${item.preco}</td>
-                <td>R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-            </tr>
-        `;
+        htmlRelatorio += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${item.preco}</td><td>R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td></tr>`;
     });
 
     htmlRelatorio += `
             </tbody>
         </table>
         <div class="total">Total Estimado: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-        <div class="footer">
-            <p>Este documento é uma lista de conferência para pedido ao fornecedor.</p>
-        </div>
+        <div class="footer"><p>Este documento é uma lista de conferência para pedido ao fornecedor.</p></div>
     </body>
     </html>
     `;
@@ -1513,20 +1598,16 @@ function gerarRelatorio() {
     win.document.close();
 }
 
-// Inicializar os controles nos cards após o carregamento
 document.addEventListener('DOMContentLoaded', () => {
     const cards = document.querySelectorAll('.card');
     cards.forEach((card, index) => {
         const h3 = card.querySelector('h3');
         const precoSpan = card.querySelector('.preco');
         if (!h3 || !precoSpan) return;
-
         const nome = h3.innerText;
         const preco = precoSpan.innerText;
         const id = 'prod-' + index;
-        
         const qtdAtual = pedido[id] ? pedido[id].qtd : 0;
-
         const controles = document.createElement('div');
         controles.className = 'controles-pedido';
         controles.style.cssText = 'display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;';
@@ -1538,12 +1619,17 @@ document.addEventListener('DOMContentLoaded', () => {
         card.querySelector('.card-body').appendChild(controles);
     });
 
-    // Adicionar botão de relatório flutuante
-    const btn = document.createElement('button');
-    btn.id = 'btn-relatorio';
-    btn.style.cssText = 'position: fixed; bottom: 30px; right: 30px; background: #3d4f45; color: white; border: none; padding: 15px 25px; border-radius: 50px; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; display: none; font-weight: bold;';
-    btn.onclick = gerarRelatorio;
-    document.body.appendChild(btn);
+    const btnRel = document.createElement('button');
+    btnRel.id = 'btn-relatorio';
+    btnRel.style.cssText = 'position: fixed; bottom: 30px; right: 30px; background: #3d4f45; color: white; border: none; padding: 15px 25px; border-radius: 50px; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; display: none; font-weight: bold;';
+    btnRel.onclick = abrirModal;
+    document.body.appendChild(btnRel);
+
+    const btnLimpar = document.createElement('button');
+    btnLimpar.id = 'btn-limpar';
+    btnLimpar.innerHTML = '🗑️ Limpar Tudo';
+    btnLimpar.onclick = limparPedido;
+    document.body.appendChild(btnLimpar);
     
     atualizarContador();
 });
