@@ -1433,6 +1433,11 @@
 #btn-relatorio { right: 20px; background: #3d4f45; }
 #btn-limpar { left: 20px; background: #c0392b; }
 
+@media (max-width: 768px) {
+    #btn-relatorio { right: 10px; bottom: 10px; padding: 12px 15px; font-size: 0.9rem; }
+    #btn-limpar { right: auto; left: 10px; bottom: 10px; padding: 12px 15px; font-size: 0.9rem; }
+}
+
 /* Controles nos Cards */
 .controles-pedido {
     display: flex !important;
@@ -1497,6 +1502,14 @@
     font-weight: bold;
     cursor: pointer;
 }
+
+/* Estilos de Impressão */
+@media print {
+    body * { visibility: hidden; }
+    #relatorio-conteudo, #relatorio-conteudo * { visibility: visible; }
+    #relatorio-conteudo { position: absolute; left: 0; top: 0; width: 100%; }
+    .no-print { display: none !important; }
+}
 </style>
 
 <!-- Estrutura do Modal -->
@@ -1540,6 +1553,7 @@
 <script>
 (function() {
     let pedido = JSON.parse(localStorage.getItem('pedido_schneider')) || {};
+    let csvDataGlobal = "";
 
     window.toggleCNPJ = function(valor) {
         const campoCnpj = document.getElementById('campo-cnpj');
@@ -1623,13 +1637,14 @@
             const precoNum = parseFloat(precoLimpo) || 0;
             const subtotal = precoNum * item.qtd;
             totalGeral += subtotal;
-            tabelaHtml += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${item.preco}</td><td>R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td></tr>`;
+            tabelaHtml += `<tr><td style="border:1px solid #ddd; padding:8px;">${item.nome}</td><td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.qtd}</td><td style="border:1px solid #ddd; padding:8px;">${item.preco}</td><td style="border:1px solid #ddd; padding:8px;">R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td></tr>`;
             csvData += `${item.nome};${item.qtd};${item.preco};R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\\n`;
         });
         csvData += "\\n;TOTAL GERAL:;;R$ " + totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-        
+        csvDataGlobal = csvData;
+
         const relatorioHtml = `
-            <div style="font-family:Arial; color:#333;">
+            <div style="font-family:Arial; color:#333; max-width:800px; margin:0 auto;">
                 <div style="text-align:center; border-bottom:2px solid #3d4f45; padding-bottom:15px; margin-bottom:20px;">
                     <h1 style="margin:0; color:#3d4f45; font-size:1.5rem;">RELATÓRIO DE PEDIDO</h1>
                     <p style="margin:5px 0;">Schneider Bebidas | Data: ${dataAtual}</p>
@@ -1659,12 +1674,15 @@
         overlay.style.display = 'block';
         
         document.getElementById('btn-csv-mobile').onclick = function() {
-            const blob = new Blob(["\\ufeff" + csvData], {type: "text/csv;charset=utf-8"});
+            const blob = new Blob(["\\ufeff" + csvDataGlobal], {type: "text/csv;charset=utf-8"});
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
             a.download = `pedido_${dataAtual.replace(/\\//g, '-')}.csv`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         };
     };
 
