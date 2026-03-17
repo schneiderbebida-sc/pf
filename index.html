@@ -1455,7 +1455,7 @@
 </div>
 
 <script>
-// Sistema de Pedidos - Schneider Bebidas (Versão Corrigida PDF + CSV)
+// Sistema de Pedidos - Schneider Bebidas (Versão Final Robusta)
 let pedido = JSON.parse(localStorage.getItem('pedido_schneider')) || {};
 
 function atualizarContador() {
@@ -1534,7 +1534,7 @@ function gerarRelatorio(nomeCli, emailCli, telCli) {
     const dataAtual = new Date().toLocaleDateString('pt-BR');
     let totalGeral = 0;
 
-    // Preparar dados para CSV
+    // Preparar dados para CSV (usando ponto e vírgula para Excel PT-BR)
     let csvData = "RELATORIO DE PEDIDO - SCHNEIDER BEBIDAS\\n";
     csvData += `Data:;${dataAtual}\\n`;
     csvData += `Cliente:;${nomeCli}\\n`;
@@ -1555,7 +1555,8 @@ function gerarRelatorio(nomeCli, emailCli, telCli) {
 
     csvData += `\\n;TOTAL GERAL:;;R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
 
-    let htmlRelatorio = `
+    const win = window.open('', '_blank');
+    win.document.write(`
     <!DOCTYPE html>
     <html lang="pt-BR">
     <head>
@@ -1589,8 +1590,8 @@ function gerarRelatorio(nomeCli, emailCli, telCli) {
         </div>
         <div class="info-cliente">
             <p><strong>Cliente:</strong> ${nomeCli}</p>
-            ${emailCli ? `<p><strong>E-mail:</strong> ${emailCli}</p>` : ''}
-            ${telCli ? `<p><strong>Telefone:</strong> ${telCli}</p>` : ''}
+            ${emailCli ? \`<p><strong>E-mail:</strong> \${emailCli}</p>\` : ''}
+            ${telCli ? \`<p><strong>Telefone:</strong> \${telCli}</p>\` : ''}
         </div>
         <table>
             <thead>
@@ -1617,10 +1618,7 @@ function gerarRelatorio(nomeCli, emailCli, telCli) {
         <\/script>
     </body>
     </html>
-    `;
-
-    const win = window.open('', '_blank');
-    win.document.write(htmlRelatorio);
+    `);
     win.document.close();
 }
 
@@ -1637,11 +1635,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const controles = document.createElement('div');
         controles.className = 'controles-pedido';
         controles.style.cssText = 'display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;';
-        controles.innerHTML = `
-            <button onclick="alterarQuantidade('${id}', '${nome.replace(/'/g, "\\\\'")}', '${preco}', -1)" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #3d4f45; background: white; color: #3d4f45; cursor: pointer; font-weight: bold;">-</button>
-            <input type="number" id="qtd-${id}" value="${qtdAtual}" onchange="digitarQuantidade('${id}', '${nome.replace(/'/g, "\\\\'")}', '${preco}', this.value)" style="width: 50px; text-align: center; border: 1px solid #ddd; border-radius: 4px; font-weight: bold; background: #fff; padding: 2px;">
-            <button onclick="alterarQuantidade('${id}', '${nome.replace(/'/g, "\\\\'")}', '${preco}', 1)" style="width: 30px; height: 30px; border-radius: 50%; border: none; background: #3d4f45; color: white; cursor: pointer; font-weight: bold;">+</button>
-        `;
+        controles.innerHTML = \`
+            <button onclick="alterarQuantidade('\${id}', '\${nome.replace(/'/g, "\\\\\\\\'")}', '\${preco}', -1)" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #3d4f45; background: white; color: #3d4f45; cursor: pointer; font-weight: bold;">-</button>
+            <input type="number" id="qtd-\${id}" value="\${qtdAtual}" onchange="digitarQuantidade('\${id}', '\${nome.replace(/'/g, "\\\\\\\\'")}', '\${preco}', this.value)" style="width: 50px; text-align: center; border: 1px solid #ddd; border-radius: 4px; font-weight: bold; background: #fff; padding: 2px;">
+            <button onclick="alterarQuantidade('\${id}', '\${nome.replace(/'/g, "\\\\\\\\'")}', '\${preco}', 1)" style="width: 30px; height: 30px; border-radius: 50%; border: none; background: #3d4f45; color: white; cursor: pointer; font-weight: bold;">+</button>
+        \`;
         card.querySelector('.card-body').appendChild(controles);
     });
 
