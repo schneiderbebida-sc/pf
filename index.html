@@ -1383,7 +1383,7 @@
 </body</html>
 
 <script>
-// Sistema de Pedidos - Schneider Bebidas
+// Sistema de Pedidos - Schneider Bebidas (Versão com Digitação Manual)
 let pedido = JSON.parse(localStorage.getItem('pedido_schneider')) || {};
 
 function atualizarContador() {
@@ -1409,6 +1409,21 @@ function alterarQuantidade(id, nome, preco, delta) {
     
     const input = document.getElementById(`qtd-${id}`);
     if (input) input.value = pedido[id] ? pedido[id].qtd : 0;
+    
+    atualizarContador();
+}
+
+function digitarQuantidade(id, nome, preco, valor) {
+    const qtd = parseInt(valor) || 0;
+    
+    if (qtd <= 0) {
+        delete pedido[id];
+    } else {
+        pedido[id] = { nome, preco, qtd: qtd };
+    }
+    
+    const input = document.getElementById(`qtd-${id}`);
+    if (input) input.value = qtd > 0 ? qtd : 0;
     
     atualizarContador();
 }
@@ -1517,7 +1532,7 @@ document.addEventListener('DOMContentLoaded', () => {
         controles.style.cssText = 'display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;';
         controles.innerHTML = `
             <button onclick="alterarQuantidade('${id}', '${nome.replace(/'/g, "\\'")}', '${preco}', -1)" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #3d4f45; background: white; color: #3d4f45; cursor: pointer; font-weight: bold;">-</button>
-            <input type="number" id="qtd-${id}" value="${qtdAtual}" readonly style="width: 40px; text-align: center; border: none; font-weight: bold; background: transparent;">
+            <input type="number" id="qtd-${id}" value="${qtdAtual}" onchange="digitarQuantidade('${id}', '${nome.replace(/'/g, "\\'")}', '${preco}', this.value)" style="width: 50px; text-align: center; border: 1px solid #ddd; border-radius: 4px; font-weight: bold; background: #fff; padding: 2px;">
             <button onclick="alterarQuantidade('${id}', '${nome.replace(/'/g, "\\'")}', '${preco}', 1)" style="width: 30px; height: 30px; border-radius: 50%; border: none; background: #3d4f45; color: white; cursor: pointer; font-weight: bold;">+</button>
         `;
         card.querySelector('.card-body').appendChild(controles);
