@@ -1508,12 +1508,39 @@
 }
 .btn-whatsapp { background: #25D366; color: white; width: 100%; margin-bottom: 10px; font-size: 1.1rem; }
 
-/* Estilos de Impressão */
+/* Estilos de Impressão - CORREÇÃO DEFINITIVA */
 @media print {
-    body * { visibility: hidden; }
-    #relatorio-conteudo, #relatorio-conteudo * { visibility: visible; }
-    #relatorio-conteudo { position: absolute; left: 0; top: 0; width: 100%; }
-    .no-print { display: none !important; }
+    /* Esconde TUDO da página original */
+    body > *:not(#relatorio-overlay) {
+        display: none !important;
+    }
+    
+    /* Garante que o overlay e seu conteúdo sejam visíveis */
+    #relatorio-overlay {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Esconde os botões de controle do relatório na impressão */
+    .no-print, .relatorio-header-mobile {
+        display: none !important;
+    }
+    
+    /* Formatação do conteúdo do relatório para papel */
+    #relatorio-conteudo {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Evita quebras de página no meio de itens */
+    tr { page-break-inside: avoid; }
 }
 </style>
 
@@ -1614,7 +1641,6 @@
     };
 
     window.abrirModal = function() { 
-        // Preencher campos com dados salvos se existirem
         if (dadosCliente.nome) document.getElementById('nome-cliente').value = dadosCliente.nome;
         if (dadosCliente.email) document.getElementById('email-cliente').value = dadosCliente.email;
         if (dadosCliente.tel) document.getElementById('tel-cliente').value = dadosCliente.tel;
@@ -1640,7 +1666,6 @@
         if (!nome) { alert("Por favor, preencha o nome."); return; }
         if (isEmpresa === 'sim' && !cnpj) { alert("Para empresas, o preenchimento do CNPJ é obrigatório."); return; }
         
-        // Salvar dados para a próxima vez
         dadosCliente = { nome, email, tel, cnpj: isEmpresa === 'sim' ? cnpj : null, data: new Date().toLocaleDateString('pt-BR') };
         localStorage.setItem('dados_cliente_schneider', JSON.stringify(dadosCliente));
         
@@ -1684,6 +1709,7 @@
                     <tbody>${tabelaHtml}</tbody>
                 </table>
                 <div style="text-align:right; font-weight:bold; font-size:1.1rem; color:#3d4f45;">Total: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                <div style="margin-top:30px; font-size:0.8rem; color:#666; text-align:center;"><p>Documento gerado para conferência de pedido.</p></div>
             </div>
         `;
 
