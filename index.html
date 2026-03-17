@@ -1489,19 +1489,24 @@
 }
 .relatorio-header-mobile {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 2px solid #3d4f45;
 }
 .btn-rel-mobile {
-    padding: 10px 15px;
-    border-radius: 5px;
+    padding: 12px 15px;
+    border-radius: 8px;
     border: none;
     color: white;
     font-weight: bold;
     cursor: pointer;
+    font-size: 0.9rem;
+    flex: 1;
+    text-align: center;
 }
+.btn-whatsapp { background: #25D366; color: white; width: 100%; margin-bottom: 10px; font-size: 1.1rem; }
 
 /* Estilos de Impressão */
 @media print {
@@ -1541,10 +1546,11 @@
 <!-- Overlay do Relatório -->
 <div id="relatorio-overlay">
     <div class="relatorio-header-mobile no-print">
-        <button onclick="document.getElementById('relatorio-overlay').style.display='none'" style="background:#666;" class="btn-rel-mobile">Voltar</button>
-        <div>
+        <button onclick="window.enviarWhatsApp()" class="btn-rel-mobile btn-whatsapp">✅ Enviar Pedido via WhatsApp</button>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="document.getElementById('relatorio-overlay').style.display='none'" style="background:#666;" class="btn-rel-mobile">Voltar</button>
             <button onclick="window.print()" style="background:#3d4f45;" class="btn-rel-mobile">Imprimir</button>
-            <button id="btn-csv-mobile" style="background:#27ae60;" class="btn-rel-mobile">CSV</button>
+            <button onclick="window.baixarCSV()" style="background:#27ae60;" class="btn-rel-mobile">CSV</button>
         </div>
     </div>
     <div id="relatorio-conteudo"></div>
@@ -1553,7 +1559,7 @@
 <script>
 (function() {
     let pedido = JSON.parse(localStorage.getItem('pedido_schneider')) || {};
-    let csvDataGlobal = "";
+    let dadosCliente = {};
 
     window.toggleCNPJ = function(valor) {
         const campoCnpj = document.getElementById('campo-cnpj');
@@ -1618,42 +1624,37 @@
         const tel = document.getElementById('tel-cliente').value;
         if (!nome) { alert("Por favor, preencha o nome."); return; }
         if (isEmpresa === 'sim' && !cnpj) { alert("Para empresas, o preenchimento do CNPJ é obrigatório."); return; }
+        
+        dadosCliente = { nome, email, tel, cnpj: isEmpresa === 'sim' ? cnpj : null, data: new Date().toLocaleDateString('pt-BR') };
         window.fecharModal();
-        window.gerarRelatorio(nome, email, tel, isEmpresa === 'sim' ? cnpj : null);
+        window.gerarRelatorio();
     };
 
-    window.gerarRelatorio = function(nomeCli, emailCli, telCli, cnpjCli) {
+    window.gerarRelatorio = function() {
         const itens = Object.values(pedido);
         if (itens.length === 0) return;
-        const dataAtual = new Date().toLocaleDateString('pt-BR');
         let totalGeral = 0;
-        
-        let csvData = "DADOS DO CLIENTE\\nData;Nome/Empresa;CNPJ;E-mail;Telefone\\n";
-        csvData += `${dataAtual};${nomeCli};${cnpjCli || '-'};${emailCli || '-'};${telCli || '-'}\\n\\nITENS DO PEDIDO\\nProduto;Quantidade;Preco Unitario;Subtotal\\n`;
-        
         let tabelaHtml = "";
+        
         itens.forEach(item => {
             const precoLimpo = item.preco.replace('R$', '').replace(/\\./g, '').replace(',', '.').trim();
             const precoNum = parseFloat(precoLimpo) || 0;
             const subtotal = precoNum * item.qtd;
             totalGeral += subtotal;
             tabelaHtml += `<tr><td style="border:1px solid #ddd; padding:8px;">${item.nome}</td><td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.qtd}</td><td style="border:1px solid #ddd; padding:8px;">${item.preco}</td><td style="border:1px solid #ddd; padding:8px;">R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td></tr>`;
-            csvData += `${item.nome};${item.qtd};${item.preco};R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\\n`;
         });
-        csvData += "\\n;TOTAL GERAL:;;R$ " + totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-        csvDataGlobal = csvData;
 
         const relatorioHtml = `
             <div style="font-family:Arial; color:#333; max-width:800px; margin:0 auto;">
                 <div style="text-align:center; border-bottom:2px solid #3d4f45; padding-bottom:15px; margin-bottom:20px;">
                     <h1 style="margin:0; color:#3d4f45; font-size:1.5rem;">RELATÓRIO DE PEDIDO</h1>
-                    <p style="margin:5px 0;">Schneider Bebidas | Data: ${dataAtual}</p>
+                    <p style="margin:5px 0;">Schneider Bebidas | Data: ${dadosCliente.data}</p>
                 </div>
                 <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px; border-left:5px solid #3d4f45;">
-                    <p><strong>${cnpjCli ? 'Empresa' : 'Cliente'}:</strong> ${nomeCli}</p>
-                    ${cnpjCli ? `<p><strong>CNPJ:</strong> ${cnpjCli}</p>` : ''}
-                    ${emailCli ? `<p><strong>E-mail:</strong> ${emailCli}</p>` : ''}
-                    ${telCli ? `<p><strong>Telefone:</strong> ${telCli}</p>` : ''}
+                    <p><strong>${dadosCliente.cnpj ? 'Empresa' : 'Cliente'}:</strong> ${dadosCliente.nome}</p>
+                    ${dadosCliente.cnpj ? `<p><strong>CNPJ:</strong> ${dadosCliente.cnpj}</p>` : ''}
+                    ${dadosCliente.email ? `<p><strong>E-mail:</strong> ${dadosCliente.email}</p>` : ''}
+                    ${dadosCliente.tel ? `<p><strong>Telefone:</strong> ${dadosCliente.tel}</p>` : ''}
                 </div>
                 <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:0.9rem;">
                     <thead><tr style="background:#3d4f45; color:#fff;">
@@ -1665,31 +1666,66 @@
                     <tbody>${tabelaHtml}</tbody>
                 </table>
                 <div style="text-align:right; font-weight:bold; font-size:1.1rem; color:#3d4f45;">Total: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-                <div style="margin-top:30px; font-size:0.8rem; color:#666; text-align:center;"><p>Documento gerado para conferência de pedido.</p></div>
             </div>
         `;
 
-        const overlay = document.getElementById('relatorio-overlay');
         document.getElementById('relatorio-conteudo').innerHTML = relatorioHtml;
-        overlay.style.display = 'block';
+        document.getElementById('relatorio-overlay').style.display = 'block';
+    };
+
+    window.enviarWhatsApp = function() {
+        const itens = Object.values(pedido);
+        let totalGeral = 0;
+        let msg = `*PEDIDO - SCHNEIDER BEBIDAS*\\n\\n`;
+        msg += `*Data:* ${dadosCliente.data}\\n`;
+        msg += `*Cliente:* ${dadosCliente.nome}\\n`;
+        if (dadosCliente.cnpj) msg += `*CNPJ:* ${dadosCliente.cnpj}\\n`;
+        if (dadosCliente.tel) msg += `*Telefone:* ${dadosCliente.tel}\\n\\n`;
+        msg += `*ITENS DO PEDIDO:*\\n`;
         
-        document.getElementById('btn-csv-mobile').onclick = function() {
-            const blob = new Blob(["\\ufeff" + csvDataGlobal], {type: "text/csv;charset=utf-8"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `pedido_${dataAtual.replace(/\\//g, '-')}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        };
+        itens.forEach(item => {
+            const precoLimpo = item.preco.replace('R$', '').replace(/\\./g, '').replace(',', '.').trim();
+            const precoNum = parseFloat(precoLimpo) || 0;
+            const subtotal = precoNum * item.qtd;
+            totalGeral += subtotal;
+            msg += `• ${item.qtd}x ${item.nome} (${item.preco})\\n`;
+        });
+        
+        msg += `\\n*TOTAL ESTIMADO: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}*`;
+        
+        const foneLoja = "5547933860900";
+        const url = `https://api.whatsapp.com/send?phone=${foneLoja}&text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+    };
+
+    window.baixarCSV = function() {
+        const itens = Object.values(pedido);
+        let totalGeral = 0;
+        let csv = "DADOS DO CLIENTE\\nData;Nome/Empresa;CNPJ;E-mail;Telefone\\n";
+        csv += `${dadosCliente.data};${dadosCliente.nome};${dadosCliente.cnpj || '-'};${dadosCliente.email || '-'};${dadosCliente.tel || '-'}\\n\\nITENS DO PEDIDO\\nProduto;Quantidade;Preco Unitario;Subtotal\\n`;
+        
+        itens.forEach(item => {
+            const precoLimpo = item.preco.replace('R$', '').replace(/\\./g, '').replace(',', '.').trim();
+            const precoNum = parseFloat(precoLimpo) || 0;
+            const subtotal = precoNum * item.qtd;
+            totalGeral += subtotal;
+            csv += `${item.nome};${item.qtd};${item.preco};R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\\n`;
+        });
+        csv += "\\n;TOTAL GERAL:;;R$ " + totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        
+        const blob = new Blob(["\\ufeff" + csv], {type: "text/csv;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `pedido_${dadosCliente.data.replace(/\\//g, '-')}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     };
 
     function inicializar() {
         const cards = document.querySelectorAll('.card');
         if (cards.length === 0) return setTimeout(inicializar, 500);
-        
         cards.forEach((card, index) => {
             if (card.querySelector('.controles-pedido')) return;
             const body = card.querySelector('.card-body');
@@ -1708,16 +1744,13 @@
             `;
             body.appendChild(div);
         });
-
         if (!document.getElementById('btn-relatorio')) {
             const b1 = document.createElement('button'); b1.id = 'btn-relatorio'; b1.onclick = window.abrirModal; document.body.appendChild(b1);
             const b2 = document.createElement('button'); b2.id = 'btn-limpar'; b2.innerHTML = '🗑️ Limpar'; b2.onclick = window.limparPedido; document.body.appendChild(b2);
         }
         window.atualizarContador();
     }
-
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicializar);
-    else inicializar();
+    inicializar();
     setTimeout(inicializar, 2000);
 })();
 </script>
