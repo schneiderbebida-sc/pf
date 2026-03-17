@@ -1387,12 +1387,12 @@
 #modal-cadastro {
     display: none;
     position: fixed;
-    z-index: 2000;
+    z-index: 9999;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.6);
+    background-color: rgba(0,0,0,0.8);
     align-items: center;
     justify-content: center;
 }
@@ -1402,35 +1402,74 @@
     border-radius: 12px;
     width: 90%;
     max-width: 450px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
 }
 .modal-content h2 { margin-top: 0; color: #3d4f45; font-size: 1.4rem; margin-bottom: 20px; }
-.modal-content label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-.modal-content input, .modal-content select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+.modal-content label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; text-align: left; }
+.modal-content input, .modal-content select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
 .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
-.btn-confirmar { background: #3d4f45; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-.btn-cancelar { background: #ccc; color: #333; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.btn-confirmar { background: #3d4f45; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.btn-cancelar { background: #ccc; color: #333; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-/* Botão Limpar */
-#btn-limpar {
+/* Botões Flutuantes */
+#btn-relatorio, #btn-limpar {
     position: fixed;
     bottom: 30px;
-    right: 260px;
-    background: #c0392b;
-    color: white;
-    border: none;
     padding: 15px 25px;
     border-radius: 50px;
     cursor: pointer;
     font-size: 1.1rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    z-index: 9000;
     display: none;
     font-weight: bold;
+    border: none;
+    color: white;
 }
-@media (max-width: 600px) {
-    #btn-limpar { right: auto; left: 30px; padding: 15px; font-size: 0.9rem; }
-    #btn-relatorio { padding: 15px; font-size: 0.9rem; }
+#btn-relatorio { right: 30px; background: #3d4f45; }
+#btn-limpar { right: 280px; background: #c0392b; }
+
+@media (max-width: 768px) {
+    #btn-relatorio { right: 10px; bottom: 10px; padding: 12px 15px; font-size: 0.9rem; }
+    #btn-limpar { right: auto; left: 10px; bottom: 10px; padding: 12px 15px; font-size: 0.9rem; }
+}
+
+/* Controles nos Cards */
+.controles-pedido {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+.btn-qtd {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+}
+.btn-qtd:active { transform: scale(0.9); }
+.btn-menos { border: 1px solid #3d4f45; background: white; color: #3d4f45; }
+.btn-mais { border: none; background: #3d4f45; color: white; }
+.input-qtd {
+    width: 55px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-weight: bold;
+    background: #fff;
+    padding: 5px;
+    font-size: 1rem;
 }
 </style>
 
@@ -1438,257 +1477,155 @@
 <div id="modal-cadastro">
     <div class="modal-content">
         <h2>Identificação do Pedido</h2>
-        
         <label for="is-empresa">Empresa?</label>
-        <select id="is-empresa" onchange="toggleCNPJ(this.value)">
+        <select id="is-empresa" onchange="window.toggleCNPJ(this.value)">
             <option value="nao">Não</option>
             <option value="sim">Sim</option>
         </select>
-
         <label for="nome-cliente" id="label-nome">Nome Completo:</label>
         <input type="text" id="nome-cliente" placeholder="Digite seu nome">
-        
         <div id="campo-cnpj" style="display: none;">
             <label for="cnpj-cliente">CNPJ (Obrigatório):</label>
             <input type="text" id="cnpj-cliente" placeholder="00.000.000/0000-00">
         </div>
-
         <label for="email-cliente">E-mail:</label>
         <input type="email" id="email-cliente" placeholder="seu@email.com">
-        
         <label for="tel-cliente">Telefone:</label>
         <input type="tel" id="tel-cliente" placeholder="(00) 00000-0000">
-        
         <div class="modal-buttons">
-            <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
-            <button class="btn-confirmar" onclick="confirmarPedido()">Gerar Relatório</button>
+            <button class="btn-cancelar" onclick="window.fecharModal()">Cancelar</button>
+            <button class="btn-confirmar" onclick="window.confirmarPedido()">Gerar Relatório</button>
         </div>
     </div>
 </div>
 
 <script>
-// Sistema de Pedidos - Schneider Bebidas (Versão com CNPJ Dinâmico)
-let pedido = JSON.parse(localStorage.getItem('pedido_schneider')) || {};
+(function() {
+    let pedido = JSON.parse(localStorage.getItem('pedido_schneider')) || {};
 
-function toggleCNPJ(valor) {
-    const campoCnpj = document.getElementById('campo-cnpj');
-    const labelNome = document.getElementById('label-nome');
-    if (valor === 'sim') {
-        campoCnpj.style.display = 'block';
-        labelNome.innerText = 'Nome da Empresa:';
-    } else {
-        campoCnpj.style.display = 'none';
-        labelNome.innerText = 'Nome Completo:';
-    }
-}
+    window.toggleCNPJ = function(valor) {
+        const campoCnpj = document.getElementById('campo-cnpj');
+        const labelNome = document.getElementById('label-nome');
+        if (valor === 'sim') {
+            campoCnpj.style.display = 'block';
+            labelNome.innerText = 'Nome da Empresa:';
+        } else {
+            campoCnpj.style.display = 'none';
+            labelNome.innerText = 'Nome Completo:';
+        }
+    };
 
-function atualizarContador() {
-    const totalItens = Object.values(pedido).reduce((acc, curr) => acc + curr.qtd, 0);
-    const btnRelatorio = document.getElementById('btn-relatorio');
-    const btnLimpar = document.getElementById('btn-limpar');
-    
-    if (btnRelatorio) {
-        btnRelatorio.innerHTML = `📋 Gerar Relatório (${totalItens})`;
-        btnRelatorio.style.display = totalItens > 0 ? 'block' : 'none';
-    }
-    if (btnLimpar) {
-        btnLimpar.style.display = totalItens > 0 ? 'block' : 'none';
-    }
-    localStorage.setItem('pedido_schneider', JSON.stringify(pedido));
-}
+    window.atualizarContador = function() {
+        const totalItens = Object.values(pedido).reduce((acc, curr) => acc + curr.qtd, 0);
+        const btnRelatorio = document.getElementById('btn-relatorio');
+        const btnLimpar = document.getElementById('btn-limpar');
+        if (btnRelatorio) {
+            btnRelatorio.innerHTML = `📋 Gerar Relatório (${totalItens})`;
+            btnRelatorio.style.display = totalItens > 0 ? 'block' : 'none';
+        }
+        if (btnLimpar) {
+            btnLimpar.style.display = totalItens > 0 ? 'block' : 'none';
+        }
+        localStorage.setItem('pedido_schneider', JSON.stringify(pedido));
+    };
 
-function alterarQuantidade(id, nome, preco, delta) {
-    if (!pedido[id]) {
-        pedido[id] = { nome, preco, qtd: 0 };
-    }
-    pedido[id].qtd += delta;
-    if (pedido[id].qtd <= 0) delete pedido[id];
-    const input = document.getElementById(`qtd-${id}`);
-    if (input) input.value = pedido[id] ? pedido[id].qtd : 0;
-    atualizarContador();
-}
+    window.alterarQuantidade = function(id, nome, preco, delta) {
+        if (!pedido[id]) pedido[id] = { nome, preco, qtd: 0 };
+        pedido[id].qtd += delta;
+        if (pedido[id].qtd <= 0) delete pedido[id];
+        const input = document.getElementById(`qtd-${id}`);
+        if (input) input.value = pedido[id] ? pedido[id].qtd : 0;
+        window.atualizarContador();
+    };
 
-function digitarQuantidade(id, nome, preco, valor) {
-    const qtd = parseInt(valor) || 0;
-    if (qtd <= 0) {
-        delete pedido[id];
-    } else {
-        pedido[id] = { nome, preco, qtd: qtd };
-    }
-    const input = document.getElementById(`qtd-${id}`);
-    if (input) input.value = qtd > 0 ? qtd : 0;
-    atualizarContador();
-}
+    window.digitarQuantidade = function(id, nome, preco, valor) {
+        const qtd = parseInt(valor) || 0;
+        if (qtd <= 0) delete pedido[id];
+        else pedido[id] = { nome, preco, qtd: qtd };
+        const input = document.getElementById(`qtd-${id}`);
+        if (input) input.value = qtd > 0 ? qtd : 0;
+        window.atualizarContador();
+    };
 
-function limparPedido() {
-    if (confirm("Deseja realmente limpar todo o seu pedido e recomeçar?")) {
-        pedido = {};
-        const inputs = document.querySelectorAll('input[id^="qtd-"]');
-        inputs.forEach(input => input.value = 0);
-        atualizarContador();
-    }
-}
+    window.limparPedido = function() {
+        if (confirm("Deseja realmente limpar todo o seu pedido e recomeçar?")) {
+            pedido = {};
+            document.querySelectorAll('.input-qtd').forEach(input => input.value = 0);
+            window.atualizarContador();
+        }
+    };
 
-function abrirModal() {
-    document.getElementById('modal-cadastro').style.display = 'flex';
-}
+    window.abrirModal = function() { document.getElementById('modal-cadastro').style.display = 'flex'; };
+    window.fecharModal = function() { document.getElementById('modal-cadastro').style.display = 'none'; };
 
-function fecharModal() {
-    document.getElementById('modal-cadastro').style.display = 'none';
-}
+    window.confirmarPedido = function() {
+        const isEmpresa = document.getElementById('is-empresa').value;
+        const nome = document.getElementById('nome-cliente').value;
+        const cnpj = document.getElementById('cnpj-cliente').value;
+        const email = document.getElementById('email-cliente').value;
+        const tel = document.getElementById('tel-cliente').value;
+        if (!nome) { alert("Por favor, preencha o nome."); return; }
+        if (isEmpresa === 'sim' && !cnpj) { alert("Para empresas, o preenchimento do CNPJ é obrigatório."); return; }
+        window.fecharModal();
+        window.gerarRelatorio(nome, email, tel, isEmpresa === 'sim' ? cnpj : null);
+    };
 
-function confirmarPedido() {
-    const isEmpresa = document.getElementById('is-empresa').value;
-    const nome = document.getElementById('nome-cliente').value;
-    const cnpj = document.getElementById('cnpj-cliente').value;
-    const email = document.getElementById('email-cliente').value;
-    const tel = document.getElementById('tel-cliente').value;
-    
-    if (!nome) {
-        alert("Por favor, preencha o nome.");
-        return;
-    }
-    
-    if (isEmpresa === 'sim' && !cnpj) {
-        alert("Para empresas, o preenchimento do CNPJ é obrigatório.");
-        return;
-    }
-    
-    fecharModal();
-    gerarRelatorio(nome, email, tel, isEmpresa === 'sim' ? cnpj : null);
-}
+    window.gerarRelatorio = function(nomeCli, emailCli, telCli, cnpjCli) {
+        const itens = Object.values(pedido);
+        if (itens.length === 0) return;
+        const dataAtual = new Date().toLocaleDateString('pt-BR');
+        let totalGeral = 0;
+        let csvData = "RELATORIO DE PEDIDO - SCHNEIDER BEBIDAS\\nData:;${dataAtual}\\nCliente:;${nomeCli}\\n";
+        if (cnpjCli) csvData += "CNPJ:;${cnpjCli}\\n";
+        csvData += "E-mail:;${emailCli || '-'}\\nTelefone:;${telCli || '-'}\\n\\nProduto;Quantidade;Preco Unitario;Subtotal\\n";
+        let tabelaHtml = "";
+        itens.forEach(item => {
+            const precoLimpo = item.preco.replace('R$', '').replace(/\\./g, '').replace(',', '.').trim();
+            const precoNum = parseFloat(precoLimpo) || 0;
+            const subtotal = precoNum * item.qtd;
+            totalGeral += subtotal;
+            tabelaHtml += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${item.preco}</td><td>R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td></tr>`;
+            csvData += `${item.nome};${item.qtd};${item.preco};R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\\n`;
+        });
+        csvData += "\\n;TOTAL GERAL:;;R$ " + totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        const win = window.open('', '_blank');
+        win.document.write(`<html><head><title>Relatório</title><style>body{font-family:Arial;padding:40px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px}th{background:#3d4f45;color:#fff}.total{text-align:right;font-weight:bold;margin-top:20px}@media print{.no-print{display:none}}</style></head><body><div class="no-print"><button onclick="window.print()">Imprimir</button><button onclick="baixarCSV()">CSV</button></div><h1>PEDIDO</h1><p>Cliente: ${nomeCli}</p>${cnpjCli ? `<p>CNPJ: ${cnpjCli}</p>` : ''}<table><thead><tr><th>Produto</th><th>Qtd</th><th>Preço</th><th>Subtotal</th></tr></thead><tbody>${tabelaHtml}</tbody></table><div class="total">Total: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div><script>function baixarCSV(){const blob=new Blob(["\\ufeff"+"${csvData}"],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="pedido.csv";a.click()}<\/script></body></html>`);
+        win.document.close();
+    };
 
-function gerarRelatorio(nomeCli, emailCli, telCli, cnpjCli) {
-    const itens = Object.values(pedido);
-    if (itens.length === 0) return;
-
-    const dataAtual = new Date().toLocaleDateString('pt-BR');
-    let totalGeral = 0;
-
-    // Preparar dados para CSV
-    let csvData = "RELATORIO DE PEDIDO - SCHNEIDER BEBIDAS\\n";
-    csvData += `Data:;${dataAtual}\\n`;
-    csvData += `Cliente:;${nomeCli}\\n`;
-    if (cnpjCli) csvData += `CNPJ:;${cnpjCli}\\n`;
-    csvData += `E-mail:;${emailCli || '-'}\\n`;
-    csvData += `Telefone:;${telCli || '-'}\\n\\n`;
-    csvData += "Produto;Quantidade;Preco Unitario;Subtotal\\n";
-
-    let tabelaHtml = "";
-    itens.forEach(item => {
-        const precoLimpo = item.preco.replace('R$', '').replace(/\\./g, '').replace(',', '.').trim();
-        const precoNum = parseFloat(precoLimpo) || 0;
-        const subtotal = precoNum * item.qtd;
-        totalGeral += subtotal;
+    function inicializar() {
+        const cards = document.querySelectorAll('.card');
+        if (cards.length === 0) return setTimeout(inicializar, 500);
         
-        tabelaHtml += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${item.preco}</td><td>R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td></tr>`;
-        csvData += `${item.nome};${item.qtd};${item.preco};R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\\n`;
-    });
+        cards.forEach((card, index) => {
+            if (card.querySelector('.controles-pedido')) return;
+            const body = card.querySelector('.card-body');
+            const h3 = card.querySelector('h3');
+            const precoSpan = card.querySelector('.preco');
+            if (!body || !h3 || !precoSpan) return;
+            const id = 'prod-' + index;
+            const nome = h3.innerText.replace(/'/g, "\\'");
+            const preco = precoSpan.innerText;
+            const div = document.createElement('div');
+            div.className = 'controles-pedido';
+            div.innerHTML = `
+                <button class="btn-qtd btn-menos" onclick="window.alterarQuantidade('${id}', '${nome}', '${preco}', -1)">-</button>
+                <input type="number" id="qtd-${id}" class="input-qtd" value="${pedido[id] ? pedido[id].qtd : 0}" onchange="window.digitarQuantidade('${id}', '${nome}', '${preco}', this.value)">
+                <button class="btn-qtd btn-mais" onclick="window.alterarQuantidade('${id}', '${nome}', '${preco}', 1)">+</button>
+            `;
+            body.appendChild(div);
+        });
 
-    csvData += `\\n;TOTAL GERAL:;;R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        if (!document.getElementById('btn-relatorio')) {
+            const b1 = document.createElement('button'); b1.id = 'btn-relatorio'; b1.onclick = window.abrirModal; document.body.appendChild(b1);
+            const b2 = document.createElement('button'); b2.id = 'btn-limpar'; b2.innerHTML = '🗑️ Limpar'; b2.onclick = window.limparPedido; document.body.appendChild(b2);
+        }
+        window.atualizarContador();
+    }
 
-    const win = window.open('', '_blank');
-    win.document.write(`
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <title>Relatório de Pedido - Schneider Bebidas</title>
-        <style>
-            body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
-            .header { text-align: center; border-bottom: 2px solid #3d4f45; padding-bottom: 20px; margin-bottom: 30px; }
-            .header h1 { color: #3d4f45; margin: 0; }
-            .info-cliente { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 30px; border-left: 5px solid #3d4f45; }
-            .info-cliente p { margin: 5px 0; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-            th { background-color: #3d4f45; color: white; }
-            tr:nth-child(even) { background-color: #f9f9f9; }
-            .total { text-align: right; font-size: 1.2rem; font-weight: bold; color: #3d4f45; }
-            .footer { margin-top: 50px; font-size: 0.9rem; color: #666; text-align: center; }
-            @media print { .no-print { display: none; } body { padding: 0; } }
-            .btn-print { background: #3d4f45; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; margin-bottom: 20px; margin-right: 10px; }
-            .btn-csv { background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; margin-bottom: 20px; }
-        </style>
-    </head>
-    <body>
-        <div class="no-print" style="text-align: right;">
-            <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
-            <button class="btn-csv" onclick="baixarCSV()">📥 Baixar CSV (Excel)</button>
-        </div>
-        <div class="header">
-            <h1>RELATÓRIO DE PEDIDO</h1>
-            <p>Schneider Bebidas | Data: ${dataAtual}</p>
-        </div>
-        <div class="info-cliente">
-            <p><strong>${cnpjCli ? 'Empresa' : 'Cliente'}:</strong> ${nomeCli}</p>
-            ${cnpjCli ? \`<p><strong>CNPJ:</strong> \${cnpjCli}</p>\` : ''}
-            ${emailCli ? \`<p><strong>E-mail:</strong> \${emailCli}</p>\` : ''}
-            ${telCli ? \`<p><strong>Telefone:</strong> \${telCli}</p>\` : ''}
-        </div>
-        <table>
-            <thead>
-                <tr><th>Produto</th><th>Qtd</th><th>Preço Unit.</th><th>Subtotal</th></tr>
-            </thead>
-            <tbody>
-                ${tabelaHtml}
-            </tbody>
-        </table>
-        <div class="total">Total Estimado: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-        <div class="footer"><p>Este documento é uma lista de conferência para pedido ao fornecedor.</p></div>
-        
-        <script>
-            function baixarCSV() {
-                const csvContent = "data:text/csv;charset=utf-8," + "${csvData}";
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "pedido_schneider_${dataAtual.replace(/\\//g, '-')}.csv");
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        <\/script>
-    </body>
-    </html>
-    `);
-    win.document.close();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const cards = document.querySelectorAll('.card');
-    cards.forEach((card, index) => {
-        const h3 = card.querySelector('h3');
-        const precoSpan = card.querySelector('.preco');
-        if (!h3 || !precoSpan) return;
-        const nome = h3.innerText;
-        const preco = precoSpan.innerText;
-        const id = 'prod-' + index;
-        const qtdAtual = pedido[id] ? pedido[id].qtd : 0;
-        const controles = document.createElement('div');
-        controles.className = 'controles-pedido';
-        controles.style.cssText = 'display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;';
-        controles.innerHTML = \`
-            <button onclick="alterarQuantidade('\${id}', '\${nome.replace(/'/g, "\\\\\\\\'")}', '\${preco}', -1)" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #3d4f45; background: white; color: #3d4f45; cursor: pointer; font-weight: bold;">-</button>
-            <input type="number" id="qtd-\${id}" value="\${qtdAtual}" onchange="digitarQuantidade('\${id}', '\${nome.replace(/'/g, "\\\\\\\\'")}', '\${preco}', this.value)" style="width: 50px; text-align: center; border: 1px solid #ddd; border-radius: 4px; font-weight: bold; background: #fff; padding: 2px;">
-            <button onclick="alterarQuantidade('\${id}', '\${nome.replace(/'/g, "\\\\\\\\'")}', '\${preco}', 1)" style="width: 30px; height: 30px; border-radius: 50%; border: none; background: #3d4f45; color: white; cursor: pointer; font-weight: bold;">+</button>
-        \`;
-        card.querySelector('.card-body').appendChild(controles);
-    });
-
-    const btnRel = document.createElement('button');
-    btnRel.id = 'btn-relatorio';
-    btnRel.style.cssText = 'position: fixed; bottom: 30px; right: 30px; background: #3d4f45; color: white; border: none; padding: 15px 25px; border-radius: 50px; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; display: none; font-weight: bold;';
-    btnRel.onclick = abrirModal;
-    document.body.appendChild(btnRel);
-
-    const btnLimpar = document.createElement('button');
-    btnLimpar.id = 'btn-limpar';
-    btnLimpar.innerHTML = '🗑️ Limpar Tudo';
-    btnLimpar.onclick = limparPedido;
-    document.body.appendChild(btnLimpar);
-    
-    atualizarContador();
-});
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicializar);
+    else inicializar();
+    setTimeout(inicializar, 2000); // Garantia extra
+})();
 </script>
 </body></html>
