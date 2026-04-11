@@ -24,7 +24,7 @@
       color: #2c2c2c;
     }
 
-    /* ── HEADER ── */
+    /* -- HEADER -- */
     header {
       background-color: var(--verde-escuro);
       padding: 30px 40px;
@@ -59,7 +59,7 @@
       margin-top: 4px;
     }
 
-    /* ── NAV ── */
+    /* -- NAV -- */
     nav {
       background-color: var(--verde-medio);
       padding: 0 20px;
@@ -83,14 +83,14 @@
       background-color: rgba(255,255,255,0.15);
     }
 
-    /* ── MAIN ── */
+    /* -- MAIN -- */
     main {
       max-width: 1400px;
       margin: 0 auto;
       padding: 40px 20px 60px;
     }
 
-    /* ── SECTION ── */
+    /* -- SECTION -- */
     .categoria {
       margin-bottom: 60px;
     }
@@ -119,14 +119,14 @@
       letter-spacing: 1px;
     }
 
-    /* ── GRID ── */
+    /* -- GRID -- */
     .produtos-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 20px;
     }
 
-    /* ── CARD ── */
+    /* -- CARD -- */
     .card {
       background: var(--branco);
       border-radius: 12px;
@@ -181,7 +181,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* ── FOOTER ── */
+    /* -- FOOTER -- */
     footer {
       background-color: var(--verde-escuro);
       color: rgba(240,236,228,0.7);
@@ -300,6 +300,8 @@
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
       width: 90%;
       max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
       transform: translateY(-20px);
       transition: transform 0.3s ease-in-out;
     }
@@ -517,11 +519,11 @@
 <a href="#outros">Outros</a>
 </nav>
 <main>
-<!-- ═══════════════ GIN ═══════════════ -->
+<!-- --------------- GIN --------------- -->
 <section class="categoria" id="gin">
 <div class="categoria-header">
 <img alt="Gin" class="cat-icon" src="images/gin_tanqueray.png"/>
-<h2>🍸 Gin</h2>
+<h2>?? Gin</h2>
 </h3><span class="preco">
 </div>
 <div class="produtos-grid">
@@ -575,11 +577,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ VODKA ═══════════════ -->
+<!-- --------------- VODKA --------------- -->
 <section class="categoria" id="vodka">
 <div class="categoria-header">
 <img alt="Vodka" class="cat-icon" src="images/vodka_greygoose.jpg"/>
-<h2>🥃 Vodka</h2>
+<h2>?? Vodka</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Vodka Grey Goose Citron 750ml" data-preco="184.59">
@@ -628,11 +630,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ WHISKY ═══════════════ -->
+<!-- --------------- WHISKY --------------- -->
 <section class="categoria" id="whisky">
 <div class="categoria-header">
 <img alt="Whisky" class="cat-icon" src="images/whisky_jackdaniels.jpg"/>
-<h2>🥃 Whisky</h2>
+<h2>?? Whisky</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Whisky Jack Daniel's No. 7" data-preco="151.97">
@@ -737,11 +739,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ ESPUMANTE ═══════════════ -->
+<!-- --------------- ESPUMANTE --------------- -->
 <section class="categoria" id="espumante">
 <div class="categoria-header">
 <img alt="Espumante" class="cat-icon" src="images/espumante_chandon.png"/>
-<h2>🥂 Espumante / Champagne</h2>/
+<h2>?? Espumante / Champagne</h2>/
     </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Spumante Chandon 1,5L" data-preco="195.0">
@@ -834,11 +836,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ VINHO TINTO ═══════════════ -->
+<!-- --------------- VINHO TINTO --------------- -->
 <section class="categoria" id="vinho-tinto">
 <div class="categoria-header">
 <img alt="Vinho Tinto" class="cat-icon" src="images/vinho_tinto_malbec.jpg"/>
-<h2>🍷 Vinho Tinto</h2>
+<h2>?? Vinho Tinto</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Norton Reserva Malbec - Mendoza" data-preco="88.92">
@@ -1036,11 +1038,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ VINHO BRANCO ═══════════════ -->
+<!-- --------------- VINHO BRANCO --------------- -->
 <section class="categoria" id="vinho-branco">
 <div class="categoria-header">
 <img alt="Vinho Branco" class="cat-icon" src="images/vinho_branco.jpg"/>
-<h2>🍾 Vinho Branco</h2>
+<h2>?? Vinho Branco</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Norton Altura White Blend - Vale de Uco" data-preco="135.89">
@@ -1157,11 +1159,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ VINHO ROSÉ ═══════════════ -->
+<!-- --------------- VINHO ROSÉ --------------- -->
 <section class="categoria" id="vinho-rose">
 <div class="categoria-header">
 <img alt="Vinho Rosé" class="cat-icon" src="images/vinho_branco.jpg"/>
-<h2>🌸 Vinho Rosé</h2>
+<h2>?? Vinho Rosé</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Sexy Fish Rosé - Mendoza" data-preco="49.57">
@@ -1190,11 +1192,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ CERVEJA ═══════════════ -->
+<!-- --------------- CERVEJA --------------- -->
 <section class="categoria" id="cerveja">
 <div class="categoria-header">
 <img alt="Cerveja" class="cat-icon" src="images/cerveja_heineken.jpg"/>
-<h2>🍺 Cerveja</h2>
+<h2>?? Cerveja</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Cerveja Heineken - Lata 350ml C12 Descartável" data-preco="5.4">
@@ -1328,11 +1330,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ ENERGÉTICO ═══════════════ -->
+<!-- --------------- ENERGÉTICO --------------- -->
 <section class="categoria" id="energetico">
 <div class="categoria-header">
 <img alt="Energético" class="cat-icon" src="images/energetico_monster.jpg"/>
-<h2>⚡ Energético</h2>
+<h2>? Energético</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Monster Energy Lata 473ml" data-preco="8.15">
@@ -1389,11 +1391,11 @@
       </div>
 </div>
 </section>
-<!-- ═══════════════ REFRIGERANTE ═══════════════ -->
+<!-- --------------- REFRIGERANTE --------------- -->
 <section class="categoria" id="refrigerante">
 <div class="categoria-header">
 <img alt="Refrigerante" class="cat-icon" src="images/refrigerante_coca.jpg"/>
-<h2>🥤 Refrigerante</h2>
+<h2>?? Refrigerante</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Coca-Cola Lata 350 ml" data-preco="3.58">
@@ -1458,11 +1460,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ LICOR ═══════════════ -->
+<!-- --------------- LICOR --------------- -->
 <section class="categoria" id="licor">
 <div class="categoria-header">
 <img alt="Licor" class="cat-icon" src="images/licor_amarula.webp"/>
-<h2>🍯 Licor</h2>
+<h2>?? Licor</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Amarula 750ml" data-preco="142.87">
@@ -1527,11 +1529,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ CACHAÇA ═══════════════ -->
+<!-- --------------- CACHAÇA --------------- -->
 <section class="categoria" id="cachaca">
 <div class="categoria-header">
 <img alt="Cachaça" class="cat-icon" src="images/cachaca.jpg"/>
-<h2>🌿 Cachaça</h2>
+<h2>?? Cachaça</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Cachaça Sagatiba" data-preco="51.87">
@@ -1565,11 +1567,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ TEQUILA ═══════════════ -->
+<!-- --------------- TEQUILA --------------- -->
 <section class="categoria" id="tequila">
 <div class="categoria-header">
 <img alt="Tequila" class="cat-icon" src="images/tequila_josecuervo.jpg"/>
-<h2>🌵 Tequila</h2>
+<h2>?? Tequila</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Jose Cuervo Gold" data-preco="116.87">
@@ -1582,11 +1584,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ ÁGUA ═══════════════ -->
+<!-- --------------- ÁGUA --------------- -->
 <section class="categoria" id="agua">
 <div class="categoria-header">
 <img alt="Água" class="cat-icon" src="images/refrigerante_coca.jpg"/>
-<h2>💧 Água</h2>
+<h2>?? Água</h2>
 </div>
 <div class="produtos-grid">
 <div class="card" data-nome="Crystal 1,5L Com Gás" data-preco="3.56">
@@ -1611,11 +1613,11 @@
 </div>
 </div>
 </section>
-<!-- ═══════════════ SUCOS ═══════════════ -->
+<!-- --------------- SUCOS --------------- -->
 <section class="categoria" id="sucos">
 <div class="categoria-header">
 <img alt="Sucos" class="cat-icon" src="images/logo.jpeg"/>
-<h2>🍹 Sucos</h2>
+<h2>?? Sucos</h2>
 </div>
 <div class="produtos-grid">
 <!-- Sucos -->
@@ -1624,11 +1626,11 @@
 <div class="card-body"><h3>Suco Skinka Frutas Cítricas - PET 450ml C12 Descartável</h3><span class="preco"> R$ -    </span></div>
 </div>
 </div></section>
-<!-- ═══════════════ OUTROS ═══════════════ -->
+<!-- --------------- OUTROS --------------- -->
 <section class="categoria" id="outros">
 <div class="categoria-header">
 <img alt="Outros" class="cat-icon" src="images/logo.jpeg"/>
-<h2>🛒 Outros Produtos</h2>
+<h2>?? Outros Produtos</h2>
 </div>
 <div class="produtos-grid">
 <!-- Absinto -->
@@ -1669,7 +1671,7 @@
 </main>
 <footer>
 <img alt="Logo" class="logo-footer" src="images/logo.jpeg"/>
-<p>Catálogo de Bebidas — Todos os preços em Reais (R$)</p>
+<p>Catálogo de Bebidas  Todos os preços em Reais (R$)</p>
 <p style="margin-top:6px; font-size:0.78rem;">Preços sujeitos a alteração sem aviso prévio.</p>
 </footer>
 <style>
@@ -1927,6 +1929,8 @@
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
       width: 90%;
       max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
       transform: translateY(-20px);
       transition: transform 0.3s ease-in-out;
     }
@@ -2139,7 +2143,7 @@
 <!-- Overlay do Relatório -->
 <div id="relatorio-overlay">
 <div class="relatorio-header-mobile no-print">
-<button class="btn-rel-mobile btn-whatsapp" onclick="window.enviarWhatsApp()">✅ Enviar Pedido via WhatsApp</button>
+<button class="btn-rel-mobile btn-whatsapp" onclick="window.enviarWhatsApp()">? Enviar Pedido via WhatsApp</button>
 <div style="display: flex; gap: 10px;">
 <button class="btn-rel-mobile" onclick="document.getElementById(\'relatorio-overlay\').style.display=\'none\'" style="background:#666;">Voltar</button>
 <button class="btn-rel-mobile" onclick="window.print()" style="background:#3d4f45;">Imprimir</button>
@@ -2191,7 +2195,7 @@
         const btnRelatorio = document.getElementById(\'btn-relatorio\');
         const btnLimpar = document.getElementById(\'btn-limpar\');
         if (btnRelatorio) {
-            btnRelatorio.innerHTML = `📋 Relatório (${totalItens})`;
+            btnRelatorio.innerHTML = `?? Relatório (${totalItens})`;
             btnRelatorio.style.display = totalItens > 0 ? \'block\' : \'none\';
         }
         if (btnLimpar) {
@@ -2318,7 +2322,7 @@
             const precoNum = parseFloat(precoLimpo) || 0;
             const subtotal = precoNum * item.qtd;
             totalGeral += subtotal;
-            msg += `• ${item.qtd}x ${item.nome} (${item.preco})\n`;
+            msg += ` ${item.qtd}x ${item.nome} (${item.preco})\n`;
         });
 
         msg += `\n*TOTAL ESTIMADO: R$ ${totalGeral.toLocaleString(\'pt-BR\', {minimumFractionDigits: 2})}*`;
@@ -2375,7 +2379,7 @@
         });
         if (!document.getElementById(\'btn-relatorio\')) {
             const b1 = document.createElement(\'button\'); b1.id = \'btn-relatorio\'; b1.onclick = window.abrirModal; document.body.appendChild(b1);
-            const b2 = document.createElement(\'button\'); b2.id = \'btn-limpar\'; b2.innerHTML = \'🗑️ Limpar\'; b2.onclick = window.limparPedido; document.body.appendChild(b2);
+            const b2 = document.createElement(\'button\'); b2.id = \'btn-limpar\'; b2.innerHTML = \'??? Limpar\'; b2.onclick = window.limparPedido; document.body.appendChild(b2);
         }
         window.atualizarContador();
     }
@@ -2398,20 +2402,32 @@
 })();
 </script>
 <div class="floating-buttons">
-<button id="clear-order-button">🗑️ Limpar Tudo</button>
-<button id="generate-report-button">📋 Gerar Relatório</button>
+<button id="clear-order-button">??? Limpar Tudo</button>
+<button id="generate-report-button">?? Gerar Relatório</button>
 </div>
 <div class="order-modal-overlay">
 <div class="order-modal-content">
 <h2>Dados do Cliente</h2>
-<label for="client-name">Nome da Empresa:</label>
-<input id="client-name" placeholder="Nome Completo ou Razão Social" required="" type="text"/>
+<label for="client-name">Nome da Empresa / Razão Social:</label>
+<input id="client-name" placeholder="Razão Social" required="" type="text"/>
+<label for="client-full-name">Nome Completo do Responsável:</label>
+<input id="client-full-name" placeholder="Nome Completo" required="" type="text"/>
 <label for="client-cnpj">CNPJ:</label>
 <input id="client-cnpj" placeholder="XX.XXX.XXX/XXXX-XX" required="" type="text"/>
+<label for="client-ie">Inscrição Estadual:</label>
+<input id="client-ie" placeholder="Inscrição Estadual" required="" type="text"/>
 <label for="client-email">E-mail:</label>
 <input id="client-email" placeholder="seu.email@exemplo.com" required="" type="email"/>
 <label for="client-phone">Telefone:</label>
 <input id="client-phone" placeholder="(XX) XXXXX-XXXX" required="" type="tel"/>
+<label for="client-cep">CEP:</label>
+<input id="client-cep" placeholder="00000-000" required="" type="text"/>
+<label for="client-address">Endereço:</label>
+<input id="client-address" placeholder="Rua, Avenida, etc." required="" type="text"/>
+<label for="client-number">Número:</label>
+<input id="client-number" placeholder="Nº" required="" type="text"/>
+<label for="client-neighborhood">Bairro:</label>
+<input id="client-neighborhood" placeholder="Bairro" required="" type="text"/>
 <div class="modal-buttons">
 <button class="cancel-button" id="cancel-modal-button">Cancelar</button>
 <button class="submit-button" id="submit-modal-button">Gerar Relatório</button>
@@ -2421,10 +2437,10 @@
 <div class="report-overlay">
 <div class="report-content">
 <div class="report-buttons">
-<button id="print-report-button">🖨️ Imprimir / PDF</button>
-<button class="csv-button" id="download-csv-button">📥 Baixar CSV (Excel)</button>
-<button class="whatsapp-button" id="send-whatsapp-button">💬 Enviar via WhatsApp</button>
-<button class="back-button" id="back-to-catalog-button">↩️ Voltar</button>
+<button id="print-report-button">??? Imprimir / PDF</button>
+<button class="csv-button" id="download-csv-button">?? Baixar CSV (Excel)</button>
+<button class="whatsapp-button" id="send-whatsapp-button">?? Enviar via WhatsApp</button>
+<button class="back-button" id="back-to-catalog-button">?? Voltar</button>
 </div>
 <div id="report-details-container"></div>
 </div>
@@ -2606,10 +2622,16 @@
 
     const savedClientData = loadClientData();
     if (savedClientData) {
-      document.getElementById('client-name').value = savedClientData.name;
-      document.getElementById('client-cnpj').value = savedClientData.cnpj;
-      document.getElementById('client-email').value = savedClientData.email;
-      document.getElementById('client-phone').value = savedClientData.phone;
+      document.getElementById('client-name').value = savedClientData.name || '';
+      document.getElementById('client-full-name').value = savedClientData.fullName || '';
+      document.getElementById('client-cnpj').value = savedClientData.cnpj || '';
+      document.getElementById('client-ie').value = savedClientData.ie || '';
+      document.getElementById('client-email').value = savedClientData.email || '';
+      document.getElementById('client-phone').value = savedClientData.phone || '';
+      document.getElementById('client-cep').value = savedClientData.cep || '';
+      document.getElementById('client-address').value = savedClientData.address || '';
+      document.getElementById('client-number').value = savedClientData.number || '';
+      document.getElementById('client-neighborhood').value = savedClientData.neighborhood || '';
     }
   });
 
@@ -2634,11 +2656,17 @@
 
   document.getElementById('submit-modal-button').addEventListener('click', () => {
     const clientName = document.getElementById('client-name').value.trim();
+    const clientFullName = document.getElementById('client-full-name').value.trim();
     const clientCnpj = document.getElementById('client-cnpj').value.trim();
+    const clientIe = document.getElementById('client-ie').value.trim();
     const clientEmail = document.getElementById('client-email').value.trim();
     const clientPhone = document.getElementById('client-phone').value.trim();
+    const clientCep = document.getElementById('client-cep').value.trim();
+    const clientAddress = document.getElementById('client-address').value.trim();
+    const clientNumber = document.getElementById('client-number').value.trim();
+    const clientNeighborhood = document.getElementById('client-neighborhood').value.trim();
 
-    if (!clientName || !clientCnpj || !clientEmail || !clientPhone) {
+    if (!clientName || !clientFullName || !clientCnpj || !clientIe || !clientEmail || !clientPhone || !clientCep || !clientAddress || !clientNumber || !clientNeighborhood) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
@@ -2648,7 +2676,18 @@
       return;
     }
 
-    const clientData = { name: clientName, cnpj: clientCnpj, email: clientEmail, phone: clientPhone };
+    const clientData = { 
+      name: clientName, 
+      fullName: clientFullName,
+      cnpj: clientCnpj, 
+      ie: clientIe,
+      email: clientEmail, 
+      phone: clientPhone,
+      cep: clientCep,
+      address: clientAddress,
+      number: clientNumber,
+      neighborhood: clientNeighborhood
+    };
     saveClientData(clientData);
 
     document.querySelector('.order-modal-overlay').classList.remove('active');
@@ -2687,10 +2726,14 @@
         <p>Data: ${new Date().toLocaleDateString('pt-BR')}</p>
       </div>
       <div class="report-details">
-        <p><strong>Cliente:</strong> ${clientData.name}</p>
+        <p><strong>Empresa:</strong> ${clientData.name}</p>
+        <p><strong>Responsável:</strong> ${clientData.fullName}</p>
         <p><strong>CNPJ:</strong> ${formatCnpj(clientData.cnpj)}</p>
+        <p><strong>Inscrição Estadual:</strong> ${clientData.ie}</p>
         <p><strong>E-mail:</strong> ${clientData.email}</p>
         <p><strong>Telefone:</strong> ${clientData.phone}</p>
+        <p><strong>Endereço:</strong> ${clientData.address}, ${clientData.number} - ${clientData.neighborhood}</p>
+        <p><strong>CEP:</strong> ${clientData.cep}</p>
       </div>
       <table class="report-table">
         <thead>
@@ -2744,10 +2787,16 @@
 
     let csvContent = "data:text/csv;charset=utf-8,";
     csvContent += `Data;${new Date().toLocaleDateString('pt-BR')}\n`;
-    csvContent += `Cliente;${clientData.name}\n`;
+    csvContent += `Empresa;${clientData.name}\n`;
+    csvContent += `Responsável;${clientData.fullName}\n`;
     csvContent += `CNPJ;${formatCnpj(clientData.cnpj)}\n`;
+    csvContent += `Inscrição Estadual;${clientData.ie}\n`;
     csvContent += `E-mail;${clientData.email}\n`;
-    csvContent += `Telefone;${clientData.phone}\n\n`;
+    csvContent += `Telefone;${clientData.phone}\n`;
+    csvContent += `CEP;${clientData.cep}\n`;
+    csvContent += `Endereço;${clientData.address}\n`;
+    csvContent += `Número;${clientData.number}\n`;
+    csvContent += `Bairro;${clientData.neighborhood}\n\n`;
     csvContent += "Produto;Quantidade;Preço Unitário;Subtotal\n";
 
     selectedProducts.forEach(p => {
@@ -2787,9 +2836,13 @@
     let whatsappMessage = `*NOVO PEDIDO - ${new Date().toLocaleDateString('pt-BR')}*\n\n`;
     whatsappMessage += `*Dados do Cliente:*\n`;
     whatsappMessage += `Empresa: ${clientData.name}\n`;
+    whatsappMessage += `Responsável: ${clientData.fullName}\n`;
     whatsappMessage += `CNPJ: ${formatCnpj(clientData.cnpj)}\n`;
+    whatsappMessage += `IE: ${clientData.ie}\n`;
     whatsappMessage += `E-mail: ${clientData.email}\n`;
-    whatsappMessage += `Telefone: ${clientData.phone}\n\n`;
+    whatsappMessage += `Telefone: ${clientData.phone}\n`;
+    whatsappMessage += `Endereço: ${clientData.address}, ${clientData.number}\n`;
+    whatsappMessage += `Bairro: ${clientData.neighborhood} - CEP: ${clientData.cep}\n\n`;
     whatsappMessage += `*Itens do Pedido:*\n`;
 
     selectedProducts.forEach(p => {
