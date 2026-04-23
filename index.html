@@ -2332,56 +2332,72 @@ function formatCurrency(value) {
       return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
     }
 
-    function generateWhatsAppMessage(event) {
-      event.preventDefault();
-
-      const form = document.getElementById('orderForm');
-      const formData = new FormData(form);
-      const clientData = Object.fromEntries(formData.entries());
-
-      let totalOrderValue = 0;
-      let selectedProducts = [];
-
-      // Seleciona todos os cards de produtos
-      const productCards = document.querySelectorAll('.product-card');
-
-      productCards.forEach(card => {
-        const input = card.querySelector('input[type="number"]');
-        const quantity = parseInt(input.value) || 0;
-
-        if (quantity > 0) {
-          const productName = card.querySelector('h3').innerText;
-          const priceText = card.querySelector('.price').innerText;
-          const unitPrice = parseCurrency(priceText); // Usa a nova função de limpeza
-          const subtotal = quantity * unitPrice;
-
-          totalOrderValue += subtotal;
-          selectedProducts.push({ name: productName, quantity, subtotal });
-        }
-      });
-
-      if (selectedProducts.length === 0) {
-        alert("Por favor, adicione pelo menos um item ao pedido.");
-        return;
-      }
-
-      // Montagem da mensagem sem espaços extras para evitar erros de negrito
-      let msg = `*NOVO PEDIDO - ${new Date().toLocaleDateString('pt-BR')}*\n\n`;
-      msg += `*Dados do Cliente:*\n`;
-      msg += `Empresa: ${clientData.name}\n`;
-      msg += `CNPJ: ${formatCnpj(clientData.cnpj)}\n\n`;
-      
-      msg += `*Itens do Pedido:*\n`;
-      selectedProducts.forEach(p => {
-        msg += `- *${p.name}* (Qtd: ${p.quantity}) - *${formatCurrency(p.subtotal)}*\n`;
-      });
-
-      msg += `\n*TOTAL DO PEDIDO: ${formatCurrency(totalOrderValue)}*\n`;
-      msg += `\n_Aguardando confirmação._`;
-
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=5547992451000&text=${encodeURIComponent(msg)}`;
-      window.open(whatsappUrl, '_blank');
+    function formatCurrency(value) {
+	      return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+	    }
+	
+	    function parseCurrency(text) {
+	      if (!text) return 0;
+	      // Remove R$, remove pontos de milhar e troca vírgula por ponto decimal
+	      return parseFloat(text.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+	    }
+	
+	    function formatCnpj(cnpj) {
+	      return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+	    }
+	
+	    function generateWhatsAppMessage(event) {
+	      event.preventDefault();
+	
+	      const form = document.getElementById('orderForm');
+	      const formData = new FormData(form);
+	      const clientData = Object.fromEntries(formData.entries());
+	
+	      let totalOrderValue = 0;
+	      let selectedProducts = [];
+	
+	      // Seleciona todos os cards de produtos
+	      const productCards = document.querySelectorAll('.product-card');
+	
+	      productCards.forEach(card => {
+	        const input = card.querySelector('input[type="number"]');
+	        const quantity = parseInt(input.value) || 0;
+	
+	        if (quantity > 0) {
+	          const productName = card.querySelector('h3').innerText;
+	          const priceText = card.querySelector('.price').innerText;
+	          const unitPrice = parseCurrency(priceText); // CORREÇÃO PARA VALORES ACIMA DE 1.000
+	          const subtotal = quantity * unitPrice;
+	
+	          totalOrderValue += subtotal;
+	          selectedProducts.push({ name: productName, quantity, subtotal });
+	        }
+	      });
+	
+	      if (selectedProducts.length === 0) {
+	        alert("Por favor, adicione pelo menos um item ao pedido.");
+	        return;
+	      }
+	
+	      // MONTAGEM DA MENSAGEM (CORRIGE AS EXCLAMAÇÕES)
+	      let msg = `*NOVO PEDIDO - ${new Date().toLocaleDateString('pt-BR')}*\n\n`;
+	      msg += `*Dados do Cliente:*\n`;
+	      msg += `Empresa: ${clientData.name}\n`;
+	      msg += `CNPJ: ${formatCnpj(clientData.cnpj)}\n\n`;
+	      
+	      msg += `*Itens do Pedido:*\n`;
+	      selectedProducts.forEach(p => {
+	        // Asteriscos colados no nome evitam as exclamações no WhatsApp
+	        msg += `- *${p.name}* (Qtd: ${p.quantity}) - *${formatCurrency(p.subtotal)}*\n`;
+	      });
+	
+	      msg += `\n*TOTAL DO PEDIDO: ${formatCurrency(totalOrderValue)}*\n`;
+	      msg += `\n_Aguardando confirmação._`;
+	
+	      const whatsappUrl = `https://api.whatsapp.com/send?phone=5547992451000&text=${encodeURIComponent(msg)}`;
+	      window.open(whatsappUrl, '_blank');
     }
+    
 </script>
 
   const PHONE_NUMBER = '5547933860900'; // Seu número de telefone para o WhatsApp
