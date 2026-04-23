@@ -2318,12 +2318,10 @@
 <div id="relatorio-conteudo"></div>
 </div>
 <script>
-    // Função para formatar moeda corretamente no padrão brasileiro
-    function formatCurrency(value) {
+function formatCurrency(value) {
       return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
-    // Função vital para converter "R$ 1.390,00" em número real (1390.00)
     function parseCurrency(text) {
       if (!text) return 0;
       // Remove R$, remove pontos de milhar e troca vírgula por ponto decimal
@@ -2344,16 +2342,17 @@
       let totalOrderValue = 0;
       let selectedProducts = [];
 
-      // Percorre todos os cards de produto para pegar quantidades e preços
-      const cards = document.querySelectorAll('.product-card');
-      cards.forEach(card => {
+      // Seleciona todos os cards de produtos
+      const productCards = document.querySelectorAll('.product-card');
+
+      productCards.forEach(card => {
         const input = card.querySelector('input[type="number"]');
         const quantity = parseInt(input.value) || 0;
 
         if (quantity > 0) {
           const productName = card.querySelector('h3').innerText;
           const priceText = card.querySelector('.price').innerText;
-          const unitPrice = parseCurrency(priceText);
+          const unitPrice = parseCurrency(priceText); // Usa a nova função de limpeza
           const subtotal = quantity * unitPrice;
 
           totalOrderValue += subtotal;
@@ -2366,7 +2365,7 @@
         return;
       }
 
-      // Montagem da mensagem (ajustada para não gerar exclamações e erro de negrito)
+      // Montagem da mensagem sem espaços extras para evitar erros de negrito
       let msg = `*NOVO PEDIDO - ${new Date().toLocaleDateString('pt-BR')}*\n\n`;
       msg += `*Dados do Cliente:*\n`;
       msg += `Empresa: ${clientData.name}\n`;
@@ -2374,7 +2373,6 @@
       
       msg += `*Itens do Pedido:*\n`;
       selectedProducts.forEach(p => {
-        // Asteriscos colados no texto para garantir o negrito no WhatsApp
         msg += `- *${p.name}* (Qtd: ${p.quantity}) - *${formatCurrency(p.subtotal)}*\n`;
       });
 
@@ -2615,12 +2613,12 @@
       return;
     }
 
-    const clientData = { 
-      name: clientName, 
+    const clientData = {
+      name: clientName,
       fullName: clientFullName,
-      cnpj: clientCnpj, 
+      cnpj: clientCnpj,
       ie: clientIe,
-      email: clientEmail, 
+      email: clientEmail,
       phone: clientPhone,
       cep: clientCep,
       address: clientAddress,
