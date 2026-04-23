@@ -2318,299 +2318,73 @@
 <div id="relatorio-conteudo"></div>
 </div>
 <script>
-(function() {
-    let pedido = JSON.parse(localStorage.getItem(\'pedido_schneider\')) || {};
-    let dadosCliente = JSON.parse(localStorage.getItem(\'dados_cliente_schneider_pj\')) || {}; // Chave diferente para PJ
-
-    // Função de validação de CNPJ
-    function validarCNPJ(cnpj) {
-        cnpj = cnpj.replace(/[.\/-]/g, \'\');
-        if (cnpj == \'\') return false;
-        if (cnpj.length != 14) return false;
-        if (/^(\\d)\\1{13}$/.test(cnpj)) return false;
-
-        let tamanho = cnpj.length - 2;
-        let numeros = cnpj.substring(0, tamanho);
-        let digitos = cnpj.substring(tamanho);
-        let soma = 0;
-        let pos = tamanho - 7;
-        for (let i = tamanho; i >= 1; i--) {
-            soma += numeros.charAt(tamanho - i) * pos--;
-            if (pos < 2) pos = 9;
-        }
-        let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-        if (resultado != digitos.charAt(0)) return false;
-
-        tamanho = tamanho + 1;
-        numeros = cnpj.substring(0, tamanho);
-        soma = 0;
-        pos = tamanho - 7;
-        for (let i = tamanho; i >= 1; i--) {
-            soma += numeros.charAt(tamanho - i) * pos--;
-            if (pos < 2) pos = 9;
-        }
-        resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-        if (resultado != digitos.charAt(1)) return false;
-
-        return true;
+    // Função para formatar moeda corretamente no padrão brasileiro
+    function formatCurrency(value) {
+      return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
-    window.atualizarContador = function() {
-        const totalItens = Object.values(pedido).reduce((acc, curr) => acc + curr.qtd, 0);
-        const btnRelatorio = document.getElementById(\'btn-relatorio\');
-        const btnLimpar = document.getElementById(\'btn-limpar\');
-        if (btnRelatorio) {
-            btnRelatorio.innerHTML = `?? Relatório (${totalItens})`;
-            btnRelatorio.style.display = totalItens > 0 ? \'block\' : \'none\';
-        }
-        if (btnLimpar) {
-            btnLimpar.style.display = totalItens > 0 ? \'block\' : \'none\';
-        }
-        localStorage.setItem(\'pedido_schneider\', JSON.stringify(pedido));
-    };
-
-    window.alterarQuantidade = function(id, nome, preco, delta) {
-        if (!pedido[id]) pedido[id] = { nome, preco, qtd: 0 };
-        pedido[id].qtd += delta;
-        if (pedido[id].qtd <= 0) delete pedido[id];
-        const input = document.getElementById(`qtd-${id}`);
-        if (input) input.value = pedido[id] ? pedido[id].qtd : 0;
-        window.atualizarContador();
-    };
-
-    window.digitarQuantidade = function(id, nome, preco, valor) {
-        const qtd = parseInt(valor) || 0;
-        if (qtd <= 0) delete pedido[id];
-        else pedido[id] = { nome, preco, qtd: qtd };
-        const input = document.getElementById(`qtd-${id}`);
-        if (input) input.value = qtd > 0 ? qtd : 0;
-        window.atualizarContador();
-    };
-
-    window.limparPedido = function() {
-        if (confirm("Deseja realmente limpar todo o seu pedido e recomeçar?")) {
-            pedido = {};
-            document.querySelectorAll(".input-qtd").forEach(input => input.value = 0);
-            window.atualizarContador();
-        }
-    };
-
-    window.abrirModal = function() {
-        // Preencher campos com dados salvos se existirem
-        if (dadosCliente.nome) document.getElementById(\'nome-cliente\').value = dadosCliente.nome;
-        if (dadosCliente.email) document.getElementById(\'email-cliente\').value = dadosCliente.email;
-        if (dadosCliente.tel) document.getElementById(\'tel-cliente\').value = dadosCliente.tel;
-        if (dadosCliente.cnpj) {
-            document.getElementById(\'cnpj-cliente\').value = dadosCliente.cnpj;
-        }
-        document.getElementById(\'modal-cadastro\').style.display = \'flex\';
-    };
-
-    window.fecharModal = function() { document.getElementById(\'modal-cadastro\').style.display = \'none\'; };
-
-    window.confirmarPedido = function() {
-        const nome = document.getElementById(\'nome-cliente\').value;
-        const cnpj = document.getElementById(\'cnpj-cliente\').value;
-        const email = document.getElementById(\'email-cliente\').value;
-        const tel = document.getElementById(\'tel-cliente\').value;
-
-        if (!nome) { alert("Por favor, preencha o Nome da Empresa."); return; }
-        if (!cnpj) { alert("Por favor, preencha o CNPJ."); return; }
-        if (!validarCNPJ(cnpj)) { alert("CNPJ inválido. Por favor, verifique."); return; }
-        if (!email) { alert("Por favor, preencha o E-mail."); return; }
-        if (!tel) { alert("Por favor, preencha o Telefone."); return; }
-
-        // Salvar dados para a próxima vez
-        dadosCliente = { nome, email, tel, cnpj, data: new Date().toLocaleDateString(\'pt-BR\') };
-        localStorage.setItem(\'dados_cliente_schneider_pj\', JSON.stringify(dadosCliente)); // Chave diferente para PJ
-
-        window.fecharModal();
-        window.gerarRelatorio();
-    };
-
-    window.gerarRelatorio = function() {
-        const itens = Object.values(pedido);
-        if (itens.length === 0) return;
-        let totalGeral = 0;
-        let tabelaHtml = "";
-
-        itens.forEach(item => {
-            const precoLimpo = item.preco.replace(\'R$\' , \'\').replace(/\\./g, \'\').replace(\'\', \'.\').trim();
-            const precoNum = parseFloat(precoLimpo) || 0;
-            const subtotal = precoNum * item.qtd;
-            totalGeral += subtotal;
-            tabelaHtml += `<tr><td style="border:1px solid #ddd; padding:8px;">${item.nome}</td><td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.qtd}</td><td style="border:1px solid #ddd; padding:8px;">${item.preco}</td><td style="border:1px solid #ddd; padding:8px;">R$ ${subtotal.toLocaleString(\'pt-BR\', {minimumFractionDigits: 2})}</td></tr>`;
-        });
-
-        const relatorioHtml = `
-            <div style="font-family:Arial; color:#333; max-width:800px; margin:0 auto;">
-                <div style="text-align:center; border-bottom:2px solid #3d4f45; padding-bottom:15px; margin-bottom:20px;">
-                    <h1 style="margin:0; color:#3d4f45; font-size:1.5rem;">RELATÓRIO DE PEDIDO (PJ)</h1>
-                    <p style="margin:5px 0;">Schneider Bebidas | Data: ${dadosCliente.data}</p>
-                </div>
-                <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px; border-left:5px solid #3d4f45;">
-                    <p><strong>Empresa:</strong> ${dadosCliente.nome}</p>
-                    <p><strong>CNPJ:</strong> ${dadosCliente.cnpj}</p>
-                    <p><strong>E-mail:</strong> ${dadosCliente.email}</p>
-                    <p><strong>Telefone:</strong> ${dadosCliente.tel}</p>
-                </div>
-                <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:0.9rem;">
-                    <thead><tr style="background:#3d4f45; color:#fff;">
-                        <th style="border:1px solid #ddd; padding:8px; text-align:left;">Produto</th>
-                        <th style="border:1px solid #ddd; padding:8px; text-align:center;">Qtd</th>
-                        <th style="border:1px solid #ddd; padding:8px; text-align:left;">Preço</th>
-                        <th style="border:1px solid #ddd; padding:8px; text-align:left;">Subtotal</th>
-                    </tr></thead>
-                    <tbody>${tabelaHtml}</tbody>
-                </table>
-                <div style="text-align:right; font-weight:bold; font-size:1.1rem; color:#3d4f45;">Total: R$ ${totalGeral.toLocaleString(\'pt-BR\', {minimumFractionDigits: 2})}</div>
-                <div style="margin-top:30px; font-size:0.8rem; color:#666; text-align:center;"><p>Documento gerado para conferência de pedido.</p></div>
-            </div>
-        `;
-
-        document.getElementById(\'relatorio-conteudo\').innerHTML = relatorioHtml;
-        document.getElementById(\'relatorio-overlay\').style.display = \'block\';
-    };
-
-    window.enviarWhatsApp = function() {
-        const itens = Object.values(pedido);
-        let totalGeral = 0;
-        let msg = `*PEDIDO (PJ) - SCHNEIDER BEBIDAS*\n\n`;
-        msg += `*Data:* ${dadosCliente.data}\n`;
-        msg += `*Empresa:* ${dadosCliente.nome}\n`;
-        msg += `*CNPJ:* ${dadosCliente.cnpj}\n`;
-        if (dadosCliente.tel) msg += `*Telefone:* ${dadosCliente.tel}\n\n`;
-        msg += `*ITENS DO PEDIDO:*\n`;
-
-        itens.forEach(item => {
-            const precoLimpo = item.preco.replace(\'R$\' , \'\').replace(/\\./g, \'\').replace(\'\', \'.\').trim();
-            const precoNum = parseFloat(precoLimpo) || 0;
-            const subtotal = precoNum * item.qtd;
-            totalGeral += subtotal;
-            msg += ` ${item.qtd}x ${item.nome} (${item.preco})\n`;
-        });
-
-        msg += `\n*TOTAL ESTIMADO: R$ ${totalGeral.toLocaleString(\'pt-BR\', {minimumFractionDigits: 2})}*`;
-
-        const foneLoja = "5547933860900";
-        const url = `https://api.whatsapp.com/send?phone=${foneLoja}&text=${encodeURIComponent(msg)}`;
-        window.open(url, \'_blank\');
-    };
-
-    window.baixarCSV = function() {
-        const itens = Object.values(pedido);
-        let totalGeral = 0;
-        let csv = "DADOS DO CLIENTE\nData;Nome da Empresa;CNPJ;E-mail;Telefone\n";
-        csv += `${dadosCliente.data};${dadosCliente.nome};${dadosCliente.cnpj};${dadosCliente.email || \'-\'};${dadosCliente.tel || \'-\'}\n\nITENS DO PEDIDO\nProduto;Quantidade;Preco Unitario;Subtotal\n`;
-
-        itens.forEach(item => {
-            const precoLimpo = item.preco.replace(\'R$\' , \'\').replace(/\\./g, \'\').replace(\'\', \'.\').trim();
-            const precoNum = parseFloat(precoLimpo) || 0;
-            const subtotal = precoNum * item.qtd;
-            totalGeral += subtotal;
-            csv += `${item.nome};${item.qtd};${item.preco};R$ ${subtotal.toLocaleString(\'pt-BR\', {minimumFractionDigits: 2})}\n`;
-        });
-        csv += "\n;TOTAL GERAL:;;R$ " + totalGeral.toLocaleString(\'pt-BR\', {minimumFractionDigits: 2});
-
-        const blob = new Blob(["\\ufeff" + csv], {type: "text/csv;charset=utf-8"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `pedido_PJ_${dadosCliente.data.replace(/\\//g, \'-\' )}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    };
-
-    function inicializarControles() {
-        const cards = document.querySelectorAll(".card");
-        cards.forEach((card, index) => {
-            if (card.querySelector(".controles-pedido")) return; // Já tem os controles
-            const body = card.querySelector(".card-body");
-            const h3 = card.querySelector(\'h3\');
-            const precoSpan = card.querySelector(".preco");
-            if (!body || !h3 || !precoSpan) return;
-            const id = \'prod-\' + index;
-            const nome = h3.innerText.replace(/\'/g, "\\'");
-            const preco = precoSpan.innerText;
-            const div = document.createElement(\'div\');
-            div.className = \'controles-pedido\';
-            div.innerHTML = `
-                <button class="btn-qtd btn-menos" onclick="window.alterarQuantidade(\'${id}\', \'${nome}\', \'${preco}\', -1)">-</button>
-                <input type="number" id="qtd-${id}" class="input-qtd" value="${pedido[id] ? pedido[id].qtd : 0}" onchange="window.digitarQuantidade(\'${id}\', \'${nome}\', \'${preco}\', this.value)">
-                <button class="btn-qtd btn-mais" onclick="window.alterarQuantidade(\'${id}\', \'${nome}\', \'${preco}\', 1)">+</button>
-            `;
-            body.appendChild(div);
-        });
-        if (!document.getElementById(\'btn-relatorio\')) {
-            const b1 = document.createElement(\'button\'); b1.id = \'btn-relatorio\'; b1.onclick = window.abrirModal; document.body.appendChild(b1);
-            const b2 = document.createElement(\'button\'); b2.id = \'btn-limpar\'; b2.innerHTML = \'??? Limpar\'; b2.onclick = window.limparPedido; document.body.appendChild(b2);
-        }
-        window.atualizarContador();
+    // Função vital para converter "R$ 1.390,00" em número real (1390.00)
+    function parseCurrency(text) {
+      if (!text) return 0;
+      // Remove R$, remove pontos de milhar e troca vírgula por ponto decimal
+      return parseFloat(text.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
     }
 
-    // Usar MutationObserver para garantir que os cards sejam processados assim que aparecem
-    const observer = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-            if (mutation.type === \'childList\' && mutation.addedNodes.length > 0) {
-                inicializarControles();
-            }
-        });
-    });
+    function formatCnpj(cnpj) {
+      return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+    }
 
-    // Observar o corpo do documento para mudanças
-    observer.observe(document.body, { childList: true, subtree: true });
+    function generateWhatsAppMessage(event) {
+      event.preventDefault();
 
-    // Tentar inicializar uma vez caso os cards já estejam presentes
-    inicializarControles();
+      const form = document.getElementById('orderForm');
+      const formData = new FormData(form);
+      const clientData = Object.fromEntries(formData.entries());
 
-})();
+      let totalOrderValue = 0;
+      let selectedProducts = [];
+
+      // Percorre todos os cards de produto para pegar quantidades e preços
+      const cards = document.querySelectorAll('.product-card');
+      cards.forEach(card => {
+        const input = card.querySelector('input[type="number"]');
+        const quantity = parseInt(input.value) || 0;
+
+        if (quantity > 0) {
+          const productName = card.querySelector('h3').innerText;
+          const priceText = card.querySelector('.price').innerText;
+          const unitPrice = parseCurrency(priceText);
+          const subtotal = quantity * unitPrice;
+
+          totalOrderValue += subtotal;
+          selectedProducts.push({ name: productName, quantity, subtotal });
+        }
+      });
+
+      if (selectedProducts.length === 0) {
+        alert("Por favor, adicione pelo menos um item ao pedido.");
+        return;
+      }
+
+      // Montagem da mensagem (ajustada para não gerar exclamações e erro de negrito)
+      let msg = `*NOVO PEDIDO - ${new Date().toLocaleDateString('pt-BR')}*\n\n`;
+      msg += `*Dados do Cliente:*\n`;
+      msg += `Empresa: ${clientData.name}\n`;
+      msg += `CNPJ: ${formatCnpj(clientData.cnpj)}\n\n`;
+      
+      msg += `*Itens do Pedido:*\n`;
+      selectedProducts.forEach(p => {
+        // Asteriscos colados no texto para garantir o negrito no WhatsApp
+        msg += `- *${p.name}* (Qtd: ${p.quantity}) - *${formatCurrency(p.subtotal)}*\n`;
+      });
+
+      msg += `\n*TOTAL DO PEDIDO: ${formatCurrency(totalOrderValue)}*\n`;
+      msg += `\n_Aguardando confirmação._`;
+
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=5547992451000&text=${encodeURIComponent(msg)}`;
+      window.open(whatsappUrl, '_blank');
+    }
 </script>
-<div class="floating-buttons">
-<button id="clear-order-button">??? Limpar Tudo</button>
-<button id="generate-report-button">?? Gerar Relatório</button>
-</div>
-<div class="order-modal-overlay">
-<div class="order-modal-content">
-<h2>Dados do Cliente</h2>
-<label for="client-name">Nome da Empresa / Razão Social:</label>
-<input id="client-name" placeholder="Razão Social" required="" type="text"/>
-<label for="client-full-name">Nome Completo do Responsável:</label>
-<input id="client-full-name" placeholder="Nome Completo" required="" type="text"/>
-<label for="client-cnpj">CNPJ:</label>
-<input id="client-cnpj" placeholder="XX.XXX.XXX/XXXX-XX" required="" type="text"/>
-<label for="client-ie">Inscrição Estadual:</label>
-<input id="client-ie" placeholder="Inscrição Estadual" required="" type="text"/>
-<label for="client-email">E-mail:</label>
-<input id="client-email" placeholder="seu.email@exemplo.com" required="" type="email"/>
-<label for="client-phone">Telefone:</label>
-<input id="client-phone" placeholder="(XX) XXXXX-XXXX" required="" type="tel"/>
-<label for="client-cep">CEP:</label>
-<input id="client-cep" placeholder="00000-000" required="" type="text"/>
-<label for="client-address">Endereço:</label>
-<input id="client-address" placeholder="Rua, Avenida, etc." required="" type="text"/>
-<label for="client-number">Número:</label>
-<input id="client-number" placeholder="Nº" required="" type="text"/>
-<label for="client-neighborhood">Bairro:</label>
-<input id="client-neighborhood" placeholder="Bairro" required="" type="text"/>
-<div class="modal-buttons">
-<button class="cancel-button" id="cancel-modal-button">Cancelar</button>
-<button class="submit-button" id="submit-modal-button">Gerar Relatório</button>
-</div>
-</div>
-</div>
-<div class="report-overlay">
-<div class="report-content">
-<div class="report-buttons">
-<button id="print-report-button">??? Imprimir / PDF</button>
-<button class="csv-button" id="download-csv-button">?? Baixar CSV (Excel)</button>
-<button class="whatsapp-button" id="send-whatsapp-button">?? Enviar via WhatsApp</button>
-<button class="back-button" id="back-to-catalog-button">?? Voltar</button>
-</div>
-<div id="report-details-container"></div>
-</div>
-</div>
-<script>
 
   const PHONE_NUMBER = '5547933860900'; // Seu número de telefone para o WhatsApp
 
@@ -3028,5 +2802,3 @@
 
 </script>
 </body></html>
-
-
