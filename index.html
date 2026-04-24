@@ -83,6 +83,45 @@
       background-color: rgba(255,255,255,0.15);
     }
 
+    
+    /* ── BUSCADOR ── */
+    .search-container {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      background-color: var(--verde-medio);
+      position: sticky;
+      top: 140px; /* Ajuste dependendo da altura do header e nav */
+      z-index: 90;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .search-container input {
+      width: 100%;
+      max-width: 600px;
+      padding: 12px 20px;
+      border: 2px solid var(--verde-claro);
+      border-radius: 25px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    .search-container input:focus {
+      border-color: var(--creme);
+      box-shadow: 0 0 8px rgba(240,236,228,0.5);
+    }
+    
+    /* Ajuste para quando não houver resultados */
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.2rem;
+      color: #666;
+      display: none;
+      width: 100%;
+    }
+
     /* ── MAIN ── */
     main {
       max-width: 1400px;
@@ -516,7 +555,12 @@
 <a href="#sucos">Sucos</a>
 <a href="#outros">Outros</a>
 </nav>
+
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="Buscar produtos por nome...">
+</div>
 <main>
+<div id="noResultsMsg" class="no-results">Nenhum produto encontrado.</div>
 <!-- --------------- GIN --------------- -->
 <section class="categoria" id="gin">
 <div class="categoria-header">
@@ -2972,6 +3016,49 @@
     document.querySelector('.report-overlay').classList.remove('active');
   });
 
+
+
+  // Funcionalidade de Busca
+  const searchInput = document.getElementById('searchInput');
+  const noResultsMsg = document.getElementById('noResultsMsg');
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase().trim();
+      const categorias = document.querySelectorAll('.categoria');
+      let totalVisibleProducts = 0;
+      
+      categorias.forEach(categoria => {
+        const cards = categoria.querySelectorAll('.card');
+        let visibleInCategoria = 0;
+        
+        cards.forEach(card => {
+          const productName = card.getAttribute('data-nome').toLowerCase();
+          if (productName.includes(searchTerm)) {
+            card.style.display = 'flex';
+            visibleInCategoria++;
+            totalVisibleProducts++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        
+        // Oculta a categoria inteira se não houver produtos visíveis nela
+        if (visibleInCategoria === 0) {
+          categoria.style.display = 'none';
+        } else {
+          categoria.style.display = 'block';
+        }
+      });
+      
+      // Mostra mensagem se nenhum produto for encontrado
+      if (totalVisibleProducts === 0 && searchTerm !== '') {
+        noResultsMsg.style.display = 'block';
+      } else {
+        noResultsMsg.style.display = 'none';
+      }
+    });
+  }
 
 </script>
 </body></html>
