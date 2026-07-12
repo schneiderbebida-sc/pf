@@ -2859,10 +2859,10 @@
       return;
     }
 
-    if (!validateCPF(clientCPF)) {
-      alert('CPF inválido. Por favor, verifique e tente novamente.');
-      return;
-    }
+    //if (!validateCPF(clientCPF)) {
+      //alert('CPF inválido. Por favor, verifique e tente novamente.');
+      //return;
+    //}
 
     const clientData = { name: clientName, CPF: clientCPF, email: clientEmail, phone: clientPhone };
     saveClientData(clientData);
