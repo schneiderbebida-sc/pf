@@ -2496,7 +2496,7 @@
                     <p style="margin:5px 0;">Schneider Bebidas | Data: ${dadosCliente.data}</p>
                 </div>
                 <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px; border-left:5px solid #3d4f45;">
-                    <p><strong>Empresa:</strong> ${dadosCliente.nome}</p>
+                    <p><strong>Nome:</strong> ${dadosCliente.nome}</p>
                     <p><strong>CPF:</strong> ${dadosCliente.CPF}</p>
                     <p><strong>E-mail:</strong> ${dadosCliente.email}</p>
                     <p><strong>Telefone:</strong> ${dadosCliente.tel}</p>
@@ -2524,7 +2524,7 @@
         let totalGeral = 0;
         let msg = `*PEDIDO (PJ) - SCHNEIDER BEBIDAS*\n\n`;
         msg += `*Data:* ${dadosCliente.data}\n`;
-        msg += `*Empresa:* ${dadosCliente.nome}\n`;
+        msg += `*Nome:* ${dadosCliente.nome}\n`;
         msg += `*CPF:* ${dadosCliente.CPF}\n`;
         if (dadosCliente.tel) msg += `*Telefone:* ${dadosCliente.tel}\n\n`;
         msg += `*ITENS DO PEDIDO:*\n`;
@@ -3002,7 +3002,7 @@
 
     let whatsappMessage = `*NOVO PEDIDO - ${new Date().toLocaleDateString('pt-BR')}*\n\n`;
     whatsappMessage += `*Dados do Cliente:*\n`;
-    whatsappMessage += `Empresa: ${clientData.name}\n`;
+    whatsappMessage += `Nome: ${clientData.name}\n`;
     whatsappMessage += `CPF: ${formatCPF(clientData.CPF)}\n`;
     whatsappMessage += `E-mail: ${clientData.email}\n`;
     whatsappMessage += `Telefone: ${clientData.phone}\n\n`;
