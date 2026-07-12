@@ -2370,11 +2370,11 @@
     let dadosCliente = JSON.parse(localStorage.getItem(\'dados_cliente_schneider_pj\')) || {}; // Chave diferente para PJ
 
     // Função de validação de CPF
-    function validarCPF(CPF) {
-        CPF = CPF.replace(/[.\/-]/g, \'\');
-        if (CPF == \'\') return false;
-        if (CPF.length != 14) return false;
-        if (/^(\\d)\\1{13}$/.test(CPF)) return false;
+   // function validarCPF(CPF) {
+     //   CPF = CPF.replace(/[.\/-]/g, \'\');
+       // if (CPF == \'\') return false;
+        //if (CPF.length != 14) return false;
+        //if (/^(\\d)\\1{13}$/.test(CPF)) return false;
 
         let tamanho = CPF.length - 2;
         let numeros = CPF.substring(0, tamanho);
